@@ -1,5 +1,5 @@
 dist: trusty
-language: bash
+language: python
 
 script:
-    - cd $TRAVIS_BUILD_DIR/tests; bash run_test.sh
+    - cd $TRAVIS_BUILD_DIR/.; python openstate_api.py
