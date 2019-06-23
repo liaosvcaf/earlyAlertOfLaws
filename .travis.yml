@@ -1,0 +1,6 @@
+dist: trusty
+language: python
+install:
+    - pip install requests
+script:
+    - cd $TRAVIS_BUILD_DIR/.; pwd; ls; python openstate_api_fetching.py
