@@ -2,4 +2,4 @@ dist: trusty
 language: python
 
 script:
-    - cd $TRAVIS_BUILD_DIR/.; python openstate_api.py
+    - cd $TRAVIS_BUILD_DIR/.; sudo apt install python-pip && sudo pip install requests && python openstate_api.py
