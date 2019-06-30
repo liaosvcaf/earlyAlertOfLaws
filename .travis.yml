@@ -1,7 +1,7 @@
-dist: trusty
 language: python
+python:
+  - "3.6"
 install:
-    - pip install requests
+  - pip install -r requirements.txt
 script:
-    - cd $TRAVIS_BUILD_DIR/.; pwd; ls; python openstate_api_fetching.py
-    - python openstate_api.py
+  - python parse_from_site.py
