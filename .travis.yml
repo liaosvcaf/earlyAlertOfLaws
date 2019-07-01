@@ -4,4 +4,4 @@ python:
 install:
   - pip install -r requirements.txt
 script:
-  - python parse_from_site.py
+  - python parsing_fncs_for_db.py
