@@ -6,8 +6,15 @@ import re
 from math import ceil
 
 
-db = 'db.db'
+def dict_factory(cursor, row):
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
+
+db = 'new.db'
 conn = sqlite3.connect(db)
+conn.row_factory = dict_factory
 cursor = conn.cursor()
 columns_names = ['code', 'subject', 'title', 'house_location', 'last_amendment_date', 'authors', 'session', 'leginfo_id']
 placeholders = ', '.join('?' * len(columns_names))
@@ -32,38 +39,60 @@ table_elems = {
 bill_info_entries = ['Law code', 'Subject', 'Status']
 pages_regex = re.compile('Page (\d+) of (\d+) pages')
 
-def insert_bills_to_db(bills, keyword=''):
-    if not keyword:
-        table_name = 'all_bills'
-    else:
-        table_name = keyword + '_bills'
+
+def update_keywords(bill_links, keyword, table='bills'):
+    for bill_link in bill_links:
+        leginfo_id = bill_id_regex.search(bill_link).group(1)
+        q = f'SELECT * FROM education_bills WHERE leginfo_id LIKE "%{leginfo_id}%"'
+        cursor.execute(q)
+        row = list(cursor)[0]
+        keywords = row['keywords']
+        keywords += ' ' + keyword
+        q = 'UPDATE education_bills SET keywords="' + keywords + f'" WHERE leginfo_id="{leginfo_id}"'
+        cursor.execute(q)
+
+def insert_bills_to_db(bills):
+    table_name = 'bills'
     for bill_dict in bills:
         columns = ', '.join(list(bill_dict.keys()))
         q = 'INSERT INTO {} ({}) VALUES ({})'.format(table_name, columns, placeholders)
         cursor.execute(q, tuple(bill_dict.values()))
     conn.commit()
-    cursor.close()
 
 def get_bills_info(bill_links, r_session):
     bills_info = list()
     for bill_link in bill_links:
         bill_info = dict()
-        print(bill_link)
         bill_id_parsed = bill_id_regex.search(bill_link)
         bill_id_param = bill_id_parsed.group(0)
         bill_info['leginfo_id'] = bill_id_parsed.group(1)
         
         bill_status_url = status_client_url + '?' + bill_id_param
         bill_page = r_session.get(bill_status_url)
+
         bill_status_soup = bs4.BeautifulSoup(bill_page.text, 'html.parser')
         
-        bill_title = bill_status_soup.find('div', id='bill_title').text
-        bill_code = bill_code_regex.search(bill_title).group(0)
-        session = session_regex.search(bill_title).group(0)
-        bill_subject = bill_title.replace(session, '').replace(bill_code, '').strip()
-        bill_info['code'] = bill_code
-        bill_info['session'] = session
-        bill_info['subject'] = bill_subject
+        try:
+            bill_title = bill_status_soup.find('div', id='bill_title').text
+            bill_code = bill_code_regex.search(bill_title).group(0)
+            session = session_regex.search(bill_title).group(0)
+            bill_info['code'] = bill_code
+            bill_info['session'] = session
+        except Exception as e:
+            with open('r.html', 'w', encoding='utf-8') as f:
+                f.write(bill_page.text)
+            print()
+            print(e)
+            print(bill_link)
+            print()
+            continue
+        
+        try:
+            bill_subject = bill_title.replace(session, '').replace(bill_code, '').strip()
+            bill_info['subject'] = bill_subject
+        except:
+            bill_info['subject'] = ''
+        
         
         # id on page - column in DB
         bill_attrs = {
@@ -75,19 +104,9 @@ def get_bills_info(bill_links, r_session):
         
         for span_id, db_col_name in bill_attrs.items():
             try:
-                bill_info[db_col_name] = bill_status_soup.find('span', id=span_id).text
+                bill_info[db_col_name] = bill_status_soup.find('span', id=span_id).text.strip()
             except:
                 bill_info[db_col_name] = ''
-        '''
-        bill_title_row = bill_status_soup.find('span', id=).text
-        house_loc = bill_status_soup.find('span', id='houseLoc').text
-        last_amendment_date = bill_status_soup.find('span', id='lastAction').text
-        authors = bill_status_soup.find('span', id='leadAuthors').text
-        bill_info['title'] = bill_title_row
-        bill_info['house_location'] = house_loc
-        bill_info['last_amendment_date'] = last_amendment_date
-        bill_info['authors'] = authors
-        '''
         
         bills_info.append(bill_info)
     return bills_info
@@ -101,8 +120,6 @@ def get_soup_with_params(base_url, session, params_dict=None, form=None):
         r = session.post(url, headers=headers, data=form)
     else:
         r = session.get(url, headers=headers)
-    with open('r.html', 'w', encoding='utf-8') as f:
-        f.write(r.text)
     soup = bs4.BeautifulSoup(r.text, 'html.parser')
     return soup
     
@@ -122,21 +139,9 @@ def get_bills(soup, num=10):
     bills = []
     results_table = soup.find('table', id='bill_results')
     for row in results_table.tbody.findAll("tr", recursive=False):
-        bill = dict()
-        for i, td in enumerate(row.findAll("td", recursive=False), 1):
-            if type(td) != str and type(td) != bs4.element.NavigableString:
-                text = td.text
-            else:
-                text = str(td)
-            table_elem = table_elems[i]
-            if table_elem == 'Law code':
-                bill['Link'] = site_url + td.a['href']
-            if text == 'x' and table_elem == 'Subject':
-                text = None
-            if table_elem in bill_info_entries:
-                bill[table_elem] = text.strip()
-        bills.append(bill)
-        if len(bills) > num:
+        link_elem = row.find("a", recursive=True)
+        bills.append(site_url + link_elem['href'])
+        if num != -1 and len(bills) > num:
             break
     return bills
 
@@ -148,23 +153,22 @@ def get_bills_on_one_page(soup):
         bills.append(site_url + link_elem.a['href'])
     return bills
 
-
-def parse_laws_into_db(num=10, keyword='', session_year='2019-2020', bill_number='', house='Both', law_code='All', statute_year='', chapter_number=''):
+def parse_laws_into_db(num=-1, keyword='', session='2019-2020', bill_number='', house='Both', law_code='All', statute_year='', chapter_number=''):
     '''
     Query bills from http://leginfo.legislature.ca.gov/faces/billSearchClient.xhtml
     Parse and add to database
-    session_year param must be in format '2019-2020' or '20192020'
+    session param must be in format '2019-2020' or '20192020'
     bill_number param must be in format 'AB-100' or 'AB100' or '100'
     Params: keyword, session_year, house, law_code, bill_number, statute_year, chapter_number
     num - number of bills to return. -1 if all available bills
     '''    
 
-    session_year = session_year.replace('-', '')
+    session = session.replace('-', '')
     bill_number = bill_number.replace('-', '')
 
     url_params = {
             'house': house,
-            'session_year': str(session_year),
+            'session_year': str(session),
             'lawCode': law_code,
             'keyword': keyword,
             'bill_number': bill_number,
@@ -180,9 +184,12 @@ def parse_laws_into_db(num=10, keyword='', session_year='2019-2020', bill_number
     
     if not bills_returned_pages:
         # only one page with all laws
-        bills = get_bills(soup, num)
+        bills_on_page_links = get_bills(soup, num)
+        print(bills_on_page_links)
+        bills_info = get_bills_info(bills_on_page_links, s)
+        insert_bills_to_db(bills_info, keyword)
+        print(bills_info)
     else:
-        bills = []
         current_page = 1
         view_state = soup.find('input', attrs={'id': 'j_id1:javax.faces.ViewState:3'})['value']
         
@@ -192,9 +199,7 @@ def parse_laws_into_db(num=10, keyword='', session_year='2019-2020', bill_number
         if num > all_laws_num or num == -1:
             num = all_laws_num
         pages_num = ceil(num/10)
-        while current_page <= pages_num:
-            print('!11')
-            
+        while current_page <= pages_num:            
             paging_params = {
                     'dataNavForm:hidden_page_index': str(current_page),
                     'dataNavForm:go_to_page': str(current_page),
@@ -205,12 +210,25 @@ def parse_laws_into_db(num=10, keyword='', session_year='2019-2020', bill_number
             bills_on_page_links = get_bills_on_one_page(soup)
             bills_info = get_bills_info(bills_on_page_links, s)
             insert_bills_to_db(bills_info, keyword)
-            bills += bills_info
-            #print(bills_on_page)
-            view_state = soup.find('input', attrs={'id': 'j_id1:javax.faces.ViewState:3'})['value']
+            #print(bills_info)
+            print(current_page)
+            try:
+                view_state = soup.find('input', attrs={'id': 'j_id1:javax.faces.ViewState:3'})['value']
+            except:
+                print('!!!!!!!!!111', current_page)
             current_page += 1
-    bills = bills[0:num]
-    return bills
+        cursor.close()
 
-parse_laws_into_db(num=10, keyword='education')
 
+
+'''
+Usage examples:
+
+Save all bills (every session) from site to database 
+year = 2020
+while year >= 2000:
+    prev_year = year - 1
+    session = str(prev_year) + '-' + str(year)
+    parse_laws_into_db(session=session, num=-1)
+    year -= 1
+'''
