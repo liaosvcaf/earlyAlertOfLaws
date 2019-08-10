@@ -12,3 +12,91 @@ As a result, we are developing a web-based service to automatically monitor the 
 * A web page (it could be the same page accepting keywords configuration) displaces the query results with links for the laws matched.
 * Deploy this service within www.svcaf.org , a wordpress-based site hosted on an AWS machine.
   * set up both testing and production deployment, triggered automatically.
+
+# Deployment
+
+## General requirements
+
+At least 2 GB of RAM is required to run ElasticSearch.
+
+Exposed 80 (HTTP) port is required to access app on other machines.
+
+## Instruction
+The following instruction is for Ubuntu.  However, you can deploy on another OS (tested on Windows and CentOS). Adapt steps 1 and 2 to your OS
+
+1. Install Python and pip
+  ```
+  sudo apt-get update
+  sudo apt-get install python3.6
+  sudo apt-get -y install python3-pip
+  ```
+
+2. Install ElasticSearch
+
+    Official guides for various OS:
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/install-elasticsearch.html
+
+    1. Install Java:
+
+    `apt-get install default-jdk -y`
+
+    2. Import the Elasticsearch PGP Key
+
+    `wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -`
+
+    3. Installing from the APT repository
+
+    ```
+    sudo apt-get install apt-transport-https
+    echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
+    sudo apt-get install elasticsearch -y
+    ```
+
+    4. Start elasticsearch service
+    Use the update-rc.d command to configure Elasticsearch to start automatically when the system boots up:
+
+    `sudo update-rc.d elasticsearch defaults 95 10`
+
+    Elasticsearch can be started and stopped using the service command:
+
+    ```
+    sudo -i service elasticsearch start
+    sudo -i service elasticsearch stop
+    ```
+
+    You can check service status with
+
+    `sudo service elasticsearch status -l`
+
+    Logs most likely are in
+    /var/log/elasticsearch/
+
+4. Install Python requirements  
+
+    `pip3 install -r requirements.txt`
+
+5. Add bills from db to elasticsearch  
+
+    Go to directory with scripts and run 
+    
+    `python3 reindex.py`
+
+6. Run the app  
+
+    `sudo python3 app.py`
+    
+    Sudo is required to to use port 80
+
+## Stopping app
+If you use Ctrl-C or close terminal/ssh session, app will stop. To keep it running, use linux utility screen. To stop the app use `sudo fuser -k 80/tcp`
+
+## DB updating
+To update the db regularly, schedule script update_db.py (use linux cron or windows scheduler)
+
+## Recreate elasticsearch data
+If there are problems with elasticsearch data, you can delete and create bills entries with:
+
+* remove_index.py - remove "bills" index from elasticsearch (remove all bills)
+* reindex.py - create "bills" index (uses bills from db to create index)
+
+
