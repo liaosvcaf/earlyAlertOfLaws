@@ -5,8 +5,8 @@ There are thousands of new laws being introduced each year in California. These 
 
 As a result, we are developing a web-based service to automatically monitor the new laws of California, with the following features: 
 * A configurable web interface for users to define a few keywords, such as education, asian, chinese, etc.
-* A backend process to use the data & APIs from https://openstates.org/ to search CA laws to find the ones matching the keywords
-  * Preferred scripting language is Python
+* A backend process to use the data http://leginfo.legislature.ca.gov to search CA laws to find the ones matching the keywords
+  * Scripting language is Python
   * links to the matched laws are returned with additional info. such as abstract and full content, etc.
   * The backend process automatically refreshes daily to get latest results
 * A web page (it could be the same page accepting keywords configuration) displaces the query results with links for the laws matched.
