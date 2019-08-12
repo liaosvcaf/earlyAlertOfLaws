@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+{% block title %}Search Results{% endblock %}
+{% block content %}
+<div class="container" style="padding:15px; margin-bottom:50px;">
+  {{ pagination.info }}
+  {{ pagination.links }}
+  <div class="table-responsive" style="padding:7px;">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Last action date</th>
+          <th>Last action name</th>
+          <th>Title</th>
+          <th>Subject</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for bill in results %}
+        <tr>
+          <td>{{ bill.code }}</td>
+          <td>{{ bill.last_action_date }}</td>
+          <td>{{ bill.last_action_name }}</td>
+          <td><a href="{{ 'http://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=' + bill.leginfo_id }}">{{ bill.title }}</a></td>
+          <td>{{ bill.subject }}</td>
+          <td><button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#myOutput{{ bill.id }}">Open</button></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+{% for bill in results %}
+ <!-- Modal -->
+  <div class="modal fade" id="myOutput{{ bill.id }}" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="col-3 button-wrapper" style="padding:15px;">
+            <a href="/bills/{{ bill.id }}" class="btn btn-info" target="_blank" role="button">Open in new tab</a>
+        </div>
+        {% include 'bill.html' %}
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+{% endfor %}
+
+{% endblock %}

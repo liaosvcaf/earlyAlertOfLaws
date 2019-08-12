@@ -133,27 +133,35 @@ def update_bill(bill_dict):
     '''
     Inserts bill into db
     '''
-    vals = "".join(['{0}="{1}",'.format(key, val) for key, val in bill_dict.items()])
-    q = 'UPDATE {} SET {} WHERE leginfo_id="{}"'.format(table_name, vals[:-1], bill_dict['leginfo_id'])
-    cursor.execute(q)
-    conn.commit()
+    try:
+        vals = "".join(['{0}="{1}",'.format(key, val) for key, val in bill_dict.items()])
+        q = 'UPDATE {} SET {} WHERE leginfo_id="{}"'.format(table_name, vals[:-1], bill_dict['leginfo_id'])
+        cursor.execute(q)
+        conn.commit()
+    except:
+        logger.error(traceback.format_exc())
+        traceback.print_exc()
 
 def insert_bill_to_db(bill_dict, check_unique=False):
     '''
     Inserts bill into db
     '''
-    columns = ', '.join(list(bill_dict.keys()))
-    placeholders = ', '.join('?' * len(list(bill_dict.keys())))
-    if check_unique:
-        q = 'SELECT * FROM {} WHERE leginfo_id="{}"'.format(table_name, bill_dict['leginfo_id'])
-        cursor.execute(q)
-        found_bills = list(cursor)
-        if found_bills:
-            # don't insert if this bill is already in db
-            return
-    q = 'INSERT INTO {} ({}) VALUES ({})'.format(table_name, columns, placeholders)
-    cursor.execute(q, tuple(bill_dict.values()))
-    conn.commit()
+    try:
+        columns = ', '.join(list(bill_dict.keys()))
+        placeholders = ', '.join('?' * len(list(bill_dict.keys())))
+        if check_unique:
+            q = 'SELECT * FROM {} WHERE leginfo_id="{}"'.format(table_name, bill_dict['leginfo_id'])
+            cursor.execute(q)
+            found_bills = list(cursor)
+            if found_bills:
+                # don't insert if this bill is already in db
+                return
+        q = 'INSERT INTO {} ({}) VALUES ({})'.format(table_name, columns, placeholders)
+        cursor.execute(q, tuple(bill_dict.values()))
+        conn.commit()
+    except:
+        logger.error(traceback.format_exc())
+        traceback.print_exc()
 
 def get_bill_from_db_by_leginfo_id(leginfo_id):
     q = 'SELECT * FROM {} WHERE leginfo_id="{}"'.format(table_name, leginfo_id)
@@ -214,7 +222,7 @@ def get_bill_attrs(bill_info, bill_status_soup):
 
 def get_bill_subject_code_session(bill_info, bill_status_soup):
     try:
-        bill_title = bill_info["title"]
+        bill_title = bill_status_soup.find('div', id='bill_title').text
         bill_code = bill_code_regex.search(bill_title).group(0)
         session = session_regex.search(bill_title).group(1)
         bill_info['code'] = bill_code
@@ -237,20 +245,30 @@ def get_bill_subject_code_session(bill_info, bill_status_soup):
     
 def get_bill_last_action(bill_info, bill_status_soup):
     # get last action date and name
-    last_action_date = bill_status_soup.find(lambda tag: \
-                             custom_tag_search(tag, "lastAction"))                
-    if last_action_date is not None:
-        last_action_date = last_action_date.text.strip()
-        last_action_date = datetime.datetime.strptime(last_action_date, "%m/%d/%y").strftime("%Y-%m-%d")
-        bill_info["last_action_date"] = last_action_date
-    else:
-        bill_info["last_action_date"] = ''
+    try:
+        last_action_date = bill_status_soup.find(lambda tag: \
+                                 custom_tag_search(tag, "lastAction"))                
+        if last_action_date is not None:
+            last_action_date = last_action_date.text.strip()
+            last_action_date = datetime.datetime.strptime(last_action_date, "%m/%d/%y").strftime("%Y-%m-%d")
+            bill_info["last_action_date"] = last_action_date
+        else:
+            bill_info["last_action_date"] = ""
+    except:
+        bill_info["last_action_date"] = ""
+        log_exception(traceback.format_exc(), bill_info)
+        traceback.print_exc()
         
-    last_action_name = bill_status_soup.find("label", attrs={"for": "lastAction"}) 
-    if last_action_name is not None:
-        bill_info["last_action_name"] = last_action_name.text.replace(":", "")
-    else:
+    try:
+        last_action_name = bill_status_soup.find("label", attrs={"for": "lastAction"}) 
+        if last_action_name is not None:
+            bill_info["last_action_name"] = last_action_name.text.replace(":", "")
+        else:
+            bill_info["last_action_name"] = ""
+    except:
         bill_info["last_action_name"] = ""
+        log_exception(traceback.format_exc(), bill_info)
+        traceback.print_exc()
 
 def save_bills_info(bill_links, r_session, check_unique):
     '''
@@ -442,11 +460,18 @@ Usage examples:
 Save all bills (every session) from site to database 
 '''
 
-
+'''
 year = 2020
 while year >= 2000:
     prev_year = year - 1
     session = str(prev_year) + '-' + str(year)
     parse_laws_into_db(session=session, num=-1)
     year -= 2
-    break
+'''
+
+year = 2018
+while year >= 2000:
+    prev_year = year - 1
+    session = str(prev_year) + '-' + str(year)
+    parse_laws_into_db(session=session, num=-1)
+    year -= 2
