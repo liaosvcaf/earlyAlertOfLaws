@@ -11,12 +11,13 @@ class SearchableMixin(object):
     @classmethod
     def get_monitoring_results(cls, query, page, per_page):
         if not query:
-            filtered = cls.query.order_by(Bill.date_published.desc()).all()[(page - 1) * per_page]
+            filtered = cls.query.order_by(Bill.last_action_date.desc()).all()
             filtered = filtered[(page - 1)*per_page:(page - 1)*per_page+per_page]
             total = len(filtered)
         else:
             ids, total = make_query(cls.__tablename__, query, page, per_page)
-            filtered = cls.query.filter(cls.id.in_(ids)).order_by(Bill.date_published.desc()).all()
+            filtered = cls.query.filter(cls.id.in_(ids)).order_by(Bill.last_action_date.desc()).all()
+            #filtered = cls.query.filter(cls.id.in_(ids)).all()
         return filtered, total
     
     @classmethod
@@ -48,7 +49,7 @@ class SearchableMixin(object):
 
 class Bill(SearchableMixin, db.Model):
     __searchable__ = ['title', 'subject', 'session', 'text', 'code', 
-                      'authors', 'leginfo_id']
+                      'authors', 'leginfo_id', 'last_action_date']
     __table__ = db.Model.metadata.tables['bills']
     
 @classmethod
@@ -72,3 +73,15 @@ Bill.reindex_by_leginfo_ids = reindex_by_leginfo_ids
 def get_all_keywords():
     with open('keywords.txt', 'r') as f:
         return [kw.strip() for kw in f.read().splitlines() if kw.strip() != '']
+
+
+if __name__ == "__main__":
+    with app.app_context():
+        per_page = 10
+        page = 3
+        offset = 10
+        
+        query = get_all_keywords()
+            
+        bills, total = Bill.get_monitoring_results(query, 
+                                                   page=page, per_page=per_page)
