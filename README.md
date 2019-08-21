@@ -91,7 +91,7 @@ The following instruction is for Ubuntu.  However, you can deploy on another OS 
 If you use Ctrl-C or close terminal/ssh session, app will stop. To keep it running, use linux utility screen. To stop the app use `sudo fuser -k 80/tcp`
 
 ## DB updating
-To update the db regularly, schedule script update_db.py (use linux cron or windows scheduler)
+To update the db regularly, schedule script update_db.py (use linux cron or windows scheduler). This script is also sends email notifications after updating
 
 ## Recreate elasticsearch data
 If there are problems with elasticsearch data, you can delete and create bills entries with:
