@@ -96,7 +96,7 @@ To update the db regularly, schedule script update_db.py (use linux cron or wind
 ## Recreate elasticsearch data
 If there are problems with elasticsearch data, you can delete and create bills entries with:
 
-* remove_index.py - remove "bills" index from elasticsearch (remove all bills)
+* recreate_index.py - remove "bills" index from elasticsearch (remove all bills) and create index again 
 * reindex.py - create "bills" index (uses bills from db to create index)
 
 
