@@ -100,3 +100,8 @@ If there are problems with elasticsearch data, you can delete and create bills e
 * reindex.py - create "bills" index (uses bills from db to create index)
 
 
+## Options
+
+Options for app (elastic search address, database filename) are in init_app.py
+
+Options for parsing and email notifications (email account and server to send notifications from) are in parsing/parsing_options.py
