@@ -1,56 +1,67 @@
 {% extends "layout.html" %}
 {% block title %}Popular Keywords{% endblock %}
 {% block content %}
-<div class="container" style="padding: 20px; ">
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        {% for message in messages %}
-          <div class="row align-items-center justify-content-center" style="padding:10px">
-            {{ message }}
-          </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-  <div class="row align-items-center justify-content-center" id="info" style="margin-bottom:30px;">
-    <div class="col-md-6">
-      <p>
-        "Monitoring" page views bills that have at least one of the keywords. It's also possible to see monitoring for specific keyword by clicking on one. When keywords change, monitoring page also changes to view bills with new keywords
-      </p>
-    </div>
-  </div>
-  <div class="row form-group align-items-center justify-content-center">
-  <form method="post" action="{{ url_for('keywords') }}">
-    <div id="add_keyword_form">
-      <input type="hidden" value="add" name="action_type"></input>
-      <p>{{form_add.new_kw(class_="form-control")}}</p>
-    </div>
-    <div class="row align-items-center justify-content-center"><input class="btn btn-primary" type="submit" value="Add new keyword"></div>
-  </form>
-  </div>
-  <div class="row align-items-center justify-content-center" style="margin-top: 30px;">
-    <h3>Keywords List</h3>
-  </div>
-  <div class="row text-center justify-content-center" >
-   <div class="col-auto">
-    <table class="table table-hover text-center table-responsive">
-      <tbody>
-        {% for kw in keywords %}
-          <tr >
-            <td><a class="keyword-link" href={{ url_for("results", search=kw) }}>{{kw}}</a></td>
-            <td>
-            <form method="post" action="{{ url_for('keywords') }}">
-              <input type="hidden" value="{{kw}}" name="name"></input>
-              <input type="hidden" value="delete" name="action_type"></input>
-              <input class="btn btn-primary" display="inline" type="submit" value="Delete">
-            </form>
-            </td>
-          </tr>
-        {% endfor %}
-        </tbody>
-      </table>
-     </div>
-  </div>
-
-  
+<div class="keywords">
+	<div class="kws-info row align-items-center justify-content-center">
+		<div class="col-md-6">
+			<p>
+				"Monitoring" page views bills that have at least one of the keywords. It's also possible to see monitoring for specific keyword by clicking on one. When keywords change, monitoring page also changes to view bills with new keywords
+			</p>
+		</div>
+	</div>
+	<div class="row align-items-center justify-content-center">
+		<div class="email-subscription">
+			<h4>
+				<a href="{{ url_for("subscribe") }}">Email subscription</a>
+			</h4>
+		</div>
+	</div>
+	<div class="messages">
+		{% with messages = get_flashed_messages() %}
+			{% if messages %}
+				{% for message in messages %}
+					<div class="message row align-items-center justify-content-center">
+						{{ message }}
+					</div>
+				{% endfor %}
+			{% endif %}
+		{% endwith %}
+	</div>
+	<div class="new-kw-form">
+		<div class="row form-group align-items-center justify-content-center">
+			<form method="post" action="{{ url_for('keywords') }}">
+				<input type="hidden" value="add" name="action_type"></input>
+				<p>{{form_add.new_kw(class_="form-control")}}</p>
+				<div class="row align-items-center justify-content-center"><input class="btn btn-primary" type="submit" value="Add new keyword"></div>
+			</form>
+		</div>
+	</div>
+	<div class="kw-list">
+		<div class="row align-items-center justify-content-center">
+			<div class="kw-list-title">
+				<h3>Keywords List</h3>
+			</div>
+		</div>
+		<div class="row text-center justify-content-center" >
+			<div class="col-auto">
+				<table class="table table-hover text-center table-responsive">
+					<tbody>
+						{% for kw in keywords %}
+							<tr >
+								<td><a class="keyword-link" href={{ url_for("search", search=kw) }}>{{kw}}</a></td>
+								<td>
+								<form method="post" action="{{ url_for('keywords') }}">
+									<input type="hidden" value="{{kw}}" name="name"></input>
+									<input type="hidden" value="delete" name="action_type"></input>
+									<input class="btn btn-primary" display="inline" type="submit" value="Delete">
+								</form>
+								</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
 </div>
 {% endblock %}

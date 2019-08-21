@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block title %}Unsubscribe{% endblock %}
+{% block content %}
+<div class="unsubscribe-messages">
+	{% with messages = get_flashed_messages() %}
+		{% if messages %}
+			{% for message in messages %}
+				<div class="message row align-items-center justify-content-center">
+					{{ message }}
+				</div>
+			{% endfor %}
+		{% endif %}
+	{% endwith %}
+</div>
+{% endblock %}

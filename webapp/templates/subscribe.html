@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block title %}Subscribe{% endblock %}
+{% block content %}
+<div class="subscribe-form">
+	<div class="messages">
+		{% with messages = get_flashed_messages() %}
+			{% if messages %}
+				{% for message in messages %}
+					<div class="message row align-items-center justify-content-center">
+						{{ message }}
+					</div>
+				{% endfor %}
+			{% endif %}
+		{% endwith %}
+	</div>
+	<div class="row form-group align-items-center justify-content-center">
+		<form method="post" action="{{ url_for('subscribe') }}">
+			<label for="email">Email</label>
+			<p>{{form.email(class_="form-control")}}</p>
+			<label for="kws">Keywords (comma separated)</label>
+			<p>{{form.kws(class_="form-control")}}</p>
+			<label for="time_limit">Time limit:</label>
+			<p>{{form.time_limit(class_="form-control")}}</p>
+			<div class="row align-items-center justify-content-center"><input class="btn btn-primary" type="submit" value="Subscribe"></div>
+		</form>
+	</div>
+</div>
+{% endblock %}

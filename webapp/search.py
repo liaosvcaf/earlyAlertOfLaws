@@ -1,6 +1,9 @@
 from flask import current_app
 
 
+def remove_index(index_name='bill'):
+    current_app.elasticsearch.indices.delete(index=index_name, ignore=[400, 404])
+
 def create_index(index_name='bill'):
     created = False
     # index settings
@@ -39,7 +42,8 @@ def remove_from_index(index, model):
         return
     current_app.elasticsearch.delete(index=index, doc_type=index, id=model.id)
     
-def make_query(index, query_params, page, per_page):
+def make_query(index, query_params, page, per_page, time_limit="1y", returned_val="id"):
+    # returned_val - str "id" (id from DB and elasticsearch) or "leginfo_id"
     if not current_app.elasticsearch:
         return [], 0
     
@@ -48,12 +52,16 @@ def make_query(index, query_params, page, per_page):
     search_conditions = [{'fuzzy': {field: query_param}} for field in search_field 
                          for query_param in query_params]
     
+    time_lim_q = "now-" + str(time_limit)
     search = current_app.elasticsearch.search(
         index = index, 
         body ={'query': {
                 'bool': {
-                    'should': [search_conditions]
-                    }
+                    'should': [search_conditions],
+                    "filter" : [
+                      { "range" : { "last_action_date" : { "gte" : time_lim_q}}}
+                    ]
+                },
               },
               'from': (page - 1) * per_page, 
               'size': per_page,
@@ -61,9 +69,16 @@ def make_query(index, query_params, page, per_page):
                  'last_action_date': {
                     'order': 'desc'
                      }
-               }]
+                 }]
                })
-    print([bill['_source'].get('last_action_date', None) for bill in search['hits']['hits']])
-    ids = [int(hit['_id']) for hit in search['hits']['hits']]
-    print(ids)
-    return ids, search['hits']['total']['value']
+    vals = []
+    if returned_val == "id":
+        vals = [int(hit['_id']) for hit in search['hits']['hits']]
+    elif returned_val == "leginfo_id":
+        vals = [hit['_source']["leginfo_id"] for hit in search['hits']['hits']]
+    return vals, search['hits']['total']['value']
+
+from init_app import app
+
+with app.app_context():
+    make_query("bill", ["education"], 1, 10, time_limit="1y")

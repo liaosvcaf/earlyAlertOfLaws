@@ -1,17 +1,17 @@
 <div class="modal-body">
-  <p><b>Bill code</b>: {{ bill.code }}</p>
-  <p><b>Bill title</b>: {{ bill.title }}</p>
-  <p><b>Bill subject</b>: {{ bill.subject }}</p>
-  <p><b>House location</b>: {{ bill.house_location }}</p>
-  <p><b>Authors</b>: {{ bill.authors }}</p>
-  <p><b>Session</b>: {{ bill.session }}</p>
-  <p><b>Last action date</b>: {{ bill.last_action_date }}</p>
-  <p><b>Last action type</b>: {{ bill.last_action_name }}</p>
-  <p><b>Date published</b>: {{ bill.date_published }}</p>
-  <p><b>California Legislative Information link</b>: 
-      <a href="{{ 'http://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=' 
-      + bill.leginfo_id }}">{{ 'http://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=' 
-      + bill.leginfo_id }}</a>
-  </p>
-  <p>{{ bill.text|replace('\n', '<br>'|safe)}}</p>
+	<p><b>Bill code</b>: {{ bill.code }}</p>
+	<p><b>Bill title</b>: {{ bill.title }}</p>
+	<p><b>Bill subject</b>: {{ bill.subject }}</p>
+	<p><b>House location</b>: {{ bill.house_location }}</p>
+	<p><b>Authors</b>: {{ bill.authors }}</p>
+	<p><b>Session</b>: {{ bill.session }}</p>
+	<p><b>Last action date</b>: {{ bill.last_action_date }}</p>
+	<p><b>Last action type</b>: {{ bill.last_action_name }}</p>
+	<p><b>Date published</b>: {{ bill.date_published }}</p>
+	<p><b>California Legislative Information link</b>: 
+		<a href="{{ 'http://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=' 
+		+ bill.leginfo_id }}">{{ 'http://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=' 
+		+ bill.leginfo_id }}</a>
+	</p>
+	<p>{{ bill.text|replace('\n', '<br>'|safe)}}</p>
 </div>
