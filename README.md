@@ -98,6 +98,7 @@ If there are problems with elasticsearch data, you can delete and create bills e
 
 * recreate_index.py - remove "bills" index from elasticsearch (remove all bills) and create index again 
 * reindex.py - create "bills" index (uses bills from db to create index)
+* parse.py - starts procedures for updating db (via site parsing) and sending email notifications after it
 
 
 ## Options
