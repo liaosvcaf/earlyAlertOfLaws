@@ -1,5 +1,5 @@
-from forms import AddKeywordForm
-from flask import flash, render_template, request, escape, redirect, url_for
+from forms import AddKeywordForm, SubscribeEmailForm, TimeWindowForm
+from flask import flash, render_template, request, escape, redirect, url_for, session
 from init_app import app
 from models import Bill
 from flask_paginate import Pagination, get_page_parameter
@@ -8,14 +8,33 @@ from flask_paginate import Pagination, get_page_parameter
 def get_all_keywords():
     with open('keywords.txt', 'r') as f:
         return [kw.strip() for kw in f.read().splitlines() if kw.strip() != '']
-    
+
+def subscribe_email(email, kws, time_limit):
+    with open('subscribed_emails.txt', 'a') as f:
+        f.write("\n" + email + ":" + kws + ":" + time_limit + "\n")
+
+def unsubscribe_email(email):
+    with open('subscribed_emails.txt', 'r') as f:
+        lines = [line.split(":") for line in f.read().splitlines()]
+        lines_updated = [":".join(line) for line in lines if line[0] != email]
+    with open('subscribed_emails.txt', 'w') as f:      
+        f.write("\n".join(lines_updated))
+        
 
 @app.route('/')
 def redirect_main_page():
-    return redirect(url_for('results', search='all'))
+    return redirect(url_for('search', search='all'))
 
-@app.route('/<search>')
-def results(search):
+@app.route('/search/<search>', methods=['GET', 'POST'])
+def search(search):
+    # time window in years
+    time_window = "1y"
+    session_tw = session.get("time_window", None)
+    if session_tw:
+        time_window = session_tw
+    if request.method == 'POST':
+        time_window = request.form.get("window") + "y"
+        session["time_window"] = time_window
     per_page = 10
     page = request.args.get(get_page_parameter(), type=int, default=1)
     offset = (page - 1) * per_page
@@ -25,17 +44,20 @@ def results(search):
     else:
         query = [search]
         
-    bills, total = Bill.get_monitoring_results(query, 
-                                               page=page, per_page=per_page)
+    bills, total = Bill.get_monitoring_results(query, page=page, 
+                                               per_page=per_page,
+                                               time_limit = time_window)
     pagination = Pagination(page=page, total=total, per_page=per_page,
                             offset=offset,
                             css_framework='bootstrap4')
+    form_tw = TimeWindowForm()
     return render_template('results.html', 
                            results=bills,
                            per_page=per_page,
                            page=page,
                            pagination=pagination,
-                           escape=escape)
+                           escape=escape,
+                           form_tw=form_tw)
 
 @app.route('/keywords', methods=['GET', 'POST'])
 def keywords():
@@ -66,6 +88,30 @@ def keywords():
         flash("Error getting keywords: " + str(e))
         kws = []
     return render_template('keywords.html', keywords=kws, form_add=add_new_kw_form)
+
+@app.route('/subscribe', methods=['GET', 'POST'])
+def subscribe():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        kws = request.form.get('kws')
+        time_limit = request.form.get('time_limit')
+        try:
+            subscribe_email(email, kws, time_limit)
+        except Exception as e:
+            flash(f'Error: ' + str(e))
+        else:
+            flash(f'Subscription successsful')
+    form = SubscribeEmailForm(request.form)
+    return render_template('subscribe.html', form=form)
+        
+@app.route('/unsubscribe/<email>')
+def unsubscribe(email):
+    try:
+        unsubscribe_email(email)
+        flash(f'Unubscribed successsful')
+    except Exception as e:
+        flash(f'Error: ' + str(e))
+    return render_template('unsubscribe.html')
 
 @app.route('/links', methods=['GET'])
 def links():

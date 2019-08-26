@@ -91,12 +91,18 @@ The following instruction is for Ubuntu.  However, you can deploy on another OS 
 If you use Ctrl-C or close terminal/ssh session, app will stop. To keep it running, use linux utility screen. To stop the app use `sudo fuser -k 80/tcp`
 
 ## DB updating
-To update the db regularly, schedule script update_db.py (use linux cron or windows scheduler)
+To update the db regularly, schedule script update_db.py (use linux cron or windows scheduler). This script is also sends email notifications after updating
 
 ## Recreate elasticsearch data
 If there are problems with elasticsearch data, you can delete and create bills entries with:
 
-* remove_index.py - remove "bills" index from elasticsearch (remove all bills)
+* recreate_index.py - remove "bills" index from elasticsearch (remove all bills) and create index again 
 * reindex.py - create "bills" index (uses bills from db to create index)
+* parse.py - starts procedures for updating db (via site parsing) and sending email notifications after it
 
 
+## Options
+
+Options for app (elastic search address, database filename) are in init_app.py
+
+Options for parsing and email notifications (email account and server to send notifications from) are in parsing/parsing_options.py

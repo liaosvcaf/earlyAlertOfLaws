@@ -3,3 +3,6 @@ flask_paginate
 elasticsearch
 flask_wtf
 flask_sqlalchemy
+requests
+BeautifulSoup4
+lxml

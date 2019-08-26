@@ -1,16 +1,15 @@
 {% extends "layout.html" %}
 {% block title %}Links{% endblock %}
 {% block content %}
-<div class="container" style="padding: 20px; ">
-  <div class="row align-items-center justify-content-center">
-  <div id="links"">
-      <div class="col-md-12" id="keywords">         
-        <ul class="list-unstyled">
-        {% for link, title in links %}
-          <li><a href={{link}}>{{title.strip()}}</a></li>
-        {% endfor %}
-        </ul>
-      </div>
-  </div>
+<div class="row align-items-center justify-content-center">
+	<div id="links">
+		<div class="col-md-12" id="keywords">         
+			<ul class="list-unstyled">
+			{% for link, title in links %}
+			  <li><a href={{link}}>{{title.strip()}}</a></li>
+			{% endfor %}
+			</ul>
+		</div>
+	</div>
 </div>
 {% endblock %}

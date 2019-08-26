@@ -1,0 +1,70 @@
+
+
+/* ------- LAYOUT ------- */
+
+.content-wrapper {
+	margin-bottom:50px;
+	padding: 20px;
+}
+
+.page-footer {
+	background-color: #e3f2fd;
+}
+
+.main-nav {
+	background-color: #e3f2fd;
+}
+
+.time-window-btn {
+	padding-right: 1.1rem;
+}
+
+.results-nav-top {
+	margin-bottom: 16px;
+}
+
+/* ------- KEYWORDS PAGE  ------- */
+
+
+.kws-info {
+	margin-bottom: 20px;
+}
+
+.email-subscription {
+	margin-bottom: 20px;
+}
+
+.message {
+	padding: 10px;
+}
+
+.kw-list-title {
+	margin-top: 40px;
+}
+
+
+/* ------- RESULTS PAGE  ------- */
+
+.results-table {
+	margin-bottom: 50px;
+	padding:7px;
+}
+
+.new-tab-btn {
+	padding:15px;
+}
+
+.tw-submit {
+	margin-top: 15px;
+}
+
+
+/* ------- PAGINATION  ------- */
+
+.pagination-page-info {
+    padding: .6em;
+    padding-left: 0;
+    width: 40em;
+    margin: .5em;
+    margin-left: 0;
+}
