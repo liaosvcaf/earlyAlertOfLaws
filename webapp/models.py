@@ -1,6 +1,6 @@
 from search import add_to_index, remove_from_index, make_query
 from init_app import db
-
+import traceback
 
 db.Model.metadata.reflect(db.engine)
 
@@ -40,7 +40,12 @@ class SearchableMixin(object):
     @classmethod
     def reindex(cls):
         for obj in cls.query.all():
-            add_to_index(cls.__tablename__, obj)
+            try:
+                print(obj.id)
+                add_to_index(cls.__tablename__, obj)
+            except:
+                traceback.print_exc()
+                continue
     
 
 class Bill(SearchableMixin, db.Model):

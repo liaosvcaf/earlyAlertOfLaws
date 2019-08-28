@@ -30,6 +30,7 @@ def create_index(index_name='bill'):
 
 def add_to_index(index, model):
     if not current_app.elasticsearch:
+        print("not current_app.elasticsearch")
         return
     payload = {}
     for field in model.__searchable__:
@@ -49,14 +50,14 @@ def make_query(index, query_params, page, per_page, time_limit="1y", returned_va
     
     search_field = ['title', 'subject', 'text']
     
-    search_conditions = [{'fuzzy': {field: query_param}} for field in search_field 
+    search_conditions = [{'fuzzy': {field: {"value": query_param, "fuzziness": "auto"}}} for field in search_field 
                          for query_param in query_params]
-    
     time_lim_q = "now-" + str(time_limit)
     search = current_app.elasticsearch.search(
         index = index, 
         body ={'query': {
                 'bool': {
+                    "minimum_should_match": "1",
                     'should': [search_conditions],
                     "filter" : [
                       { "range" : { "last_action_date" : { "gte" : time_lim_q}}}
@@ -78,7 +79,9 @@ def make_query(index, query_params, page, per_page, time_limit="1y", returned_va
         vals = [hit['_source']["leginfo_id"] for hit in search['hits']['hits']]
     return vals, search['hits']['total']['value']
 
+"""
 from init_app import app
 
 with app.app_context():
-    make_query("bill", ["education"], 1, 10, time_limit="1y")
+    print(make_query("bill", ["chinese"], 1, 10, time_limit="1y"))
+"""
