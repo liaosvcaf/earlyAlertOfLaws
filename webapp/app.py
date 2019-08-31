@@ -7,7 +7,7 @@ from flask_paginate import Pagination, get_page_parameter
 
 def get_all_keywords():
     with open('keywords.txt', 'r') as f:
-        return [kw.strip() for kw in f.read().splitlines() if kw.strip() != '']
+        return [kw.strip() for kw in f.read().splitlines() if kw.strip()]
 
 def subscribe_email(email, kws, time_limit):
     with open('subscribed_emails.txt', 'a') as f:
@@ -43,7 +43,7 @@ def search(search):
         query = get_all_keywords()
     else:
         query = [search]
-        
+            
     bills, total = Bill.get_monitoring_results(query, page=page, 
                                                per_page=per_page,
                                                time_limit = time_window)
@@ -66,7 +66,7 @@ def keywords():
             new_keyword = request.form.get('new_kw')
             try:
                 with open('keywords.txt', 'a') as f:
-                    f.write(new_keyword + '\n')
+                    f.write('\n' + new_keyword + '\n')
                     flash(f'New keyword {new_keyword} added')
             except Exception as e:
                     flash(f'Error adding new keyword: ' + str(e))
@@ -134,5 +134,4 @@ def page_not_found(e):
     return render_template('404.html'), 404
 
 if __name__ == '__main__':
-    app.run()
-    #app.run("0.0.0.0", port=80)
+    app.run("0.0.0.0", port=80)
