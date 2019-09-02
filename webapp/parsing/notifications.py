@@ -78,7 +78,7 @@ def send_email_notifications(email_server, email_port, email_pass, sender_email)
                 if not bill_info:
                     continue
                 bill_info = bill_info.split(";")
-                print(bill_info)
+                #print(bill_info)
                 bill_id = bill_info[0]
                 bill_last_action_name_prev = bill_info[1]
                 bill_info_tuple = updated_bill_info(id=bill_id,
@@ -165,24 +165,46 @@ You can unsubscribe using following link: {unsubscribe_link}
         logger.info("Email text: \n" + text)
         return text
 
+def send_email(server, from_, to, subject, msg_text):
+    msg = MIMEMultipart()
+    msg.add_header('From', from_)
+    msg.add_header("To", to)
+    msg.add_header("Subject", subject)
+    msg.attach(MIMEText(msg_text, 'plain'))
+    server.sendmail(
+      from_,
+      to,
+      msg.as_string().encode("utf-8"))
+
 def send_changes(server, from_, to, changes):
     logger.info("Sending email notifications")
+    msg_text = get_msg_text(changes, to)
+    now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    subj = f'California Bills Updates for ' + now
     try:
-        msg_text = get_msg_text(changes, to)
-        msg = MIMEMultipart()
-        msg.add_header('From', from_)
-        msg.add_header("To", to)
-        now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        msg.add_header("Subject", f'California Bills Updates for ' + now)
-        
-        msg.attach(MIMEText(msg_text, 'plain'))
-        
-        server.sendmail(
-          from_,
-          to,
-          msg.as_string().encode("utf-8"))
-        return None
+        send_email(server, from_, to, subj, msg_text)
     except Exception:
         logger.error(traceback.format_exc())
+        print(traceback.format_exc())
         return traceback.format_exc()
+    
+def send_email_subs_start_notification(receiver_email, kws, email_server, 
+                                       email_acc, email_port, email_pass):
+    authed_email_server = get_auth_smtp_server(email_server, email_port, email_acc, email_pass)
+    subject = "You have subscribed to email alerts on California Bills Monitoring App"
+    kws = "Saved keywords: " + ", ".join(kws)
+    unsubscribe_link = site_addr + "unsubscribe/" + receiver_email
+
+    msg_text = f"""
+<html>
+  <head></head>
+  <body>
+    <h2>Subscription to email alerts on California Bills Monitoring App successful</h2>
+    <p>{kws}</p>
+    <p>You can unsubscribe using following link: {unsubscribe_link}</p>
+  </body>
+</html>
+
+"""
+    send_email(authed_email_server, email_acc, receiver_email, subject, msg_text)
     

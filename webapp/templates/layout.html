@@ -14,7 +14,7 @@
 </head>
  
 <body>
-	<nav class="main-nav navbar navbar-expand-lg navbar-light">
+	<nav class="nav-top main-nav navbar navbar-expand-lg navbar-light">
 		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 		</button>
@@ -33,6 +33,9 @@
 				<li>
 					<a class="nav-link" href="{{ url_for('links')}}">Links</a>
 				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{{ url_for("subscribe") }}">Email subscription</a>
+				</li>
 			</ul>
 		</div>
 	</nav>
@@ -45,10 +48,31 @@
 		</div>
 	</div>
 	
+
+
 	<div class="footer">
 		{% block footer %}
+
 		<footer class="page-footer font-small fixed-bottom">
-			<div class="footer-copyright text-center py-3">© 2019 Copyright:
+			<nav class="nav-bottom main-nav navbar navbar-expand navbar-light">
+				<div class="collapse navbar-collapse">
+					<ul class="navbar-nav nav-bottom-ul mx-auto">
+						<li class="nav-item">
+							<a class="nav-link" href="{{ url_for('search', search='all')}}">Monitoring</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="{{ url_for('keywords')}}">Keywords</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="{{ url_for('links')}}">Links</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="{{ url_for("subscribe") }}">Email subscription</a>
+						</li>
+					</ul>
+				</div>
+			</nav>
+			<div class="footer-copyright text-center">© 2019 Copyright:
 				<a href="https://mdbootstrap.com/education/bootstrap/"> www.svcaf.org</a>
 			</div>
 		</footer>

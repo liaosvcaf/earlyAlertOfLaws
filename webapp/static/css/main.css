@@ -23,8 +23,24 @@
 	margin-bottom: 16px;
 }
 
-/* ------- KEYWORDS PAGE  ------- */
+.nav-item {
+	margin: 0 20px;
+}
 
+.footer-copyright {
+	padding-bottom: 10px;
+}
+
+/* 320-576px */
+@media screen and (max-width: 576px) {
+	.nav-bottom-ul {
+		flex-direction: column !important;
+		align-items: center;
+	}
+}
+
+
+/* ------- KEYWORDS PAGE  ------- */
 
 .kws-info {
 	margin-bottom: 20px;
