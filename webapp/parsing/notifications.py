@@ -165,12 +165,12 @@ You can unsubscribe using following link: {unsubscribe_link}
         logger.info("Email text: \n" + text)
         return text
 
-def send_email(server, from_, to, subject, msg_text):
+def send_email(server, from_, to, subject, msg_text, type_="plain"):
     msg = MIMEMultipart()
     msg.add_header('From', from_)
     msg.add_header("To", to)
     msg.add_header("Subject", subject)
-    msg.attach(MIMEText(msg_text, 'plain'))
+    msg.attach(MIMEText(msg_text, type_))
     server.sendmail(
       from_,
       to,
@@ -206,5 +206,5 @@ def send_email_subs_start_notification(receiver_email, kws, email_server,
 </html>
 
 """
-    send_email(authed_email_server, email_acc, receiver_email, subject, msg_text)
+    send_email(authed_email_server, email_acc, receiver_email, subject, msg_text, type_="html")
     
