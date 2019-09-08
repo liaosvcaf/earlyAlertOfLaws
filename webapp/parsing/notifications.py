@@ -166,12 +166,13 @@ You can unsubscribe using following link: {unsubscribe_link}
         logger.info("Email text: \n" + text)
         return text
 
-def send_email(server, from_, to, subject, msg_text, html_msg_text=None, type_="plain"):
+def send_email(server, from_, to, subject, msg_text=None, html_msg_text=None, type_="plain"):
     msg = MIMEMultipart()
     msg.add_header('From', from_)
     msg.add_header("To", to)
     msg.add_header("Subject", subject)
-    msg.attach(MIMEText(msg_text, "plain"))
+    if type_=="plain":
+        msg.attach(MIMEText(msg_text, "plain"))
     if type_=="html" and html_msg_text:
         msg.attach(MIMEText(html_msg_text, "html"))    
     server.sendmail(
@@ -209,9 +210,9 @@ def send_email_subs_start_notification(receiver_email, kws, email_server,
   <body>
     <h2>Subscription to email alerts on California Bills Monitoring App successful</h2>
     <p>{kws}</p>
-    <p>You can unsubscribe using following link: <a href="{unsubscribe_link}">link</a></p>
+    <p>You can unsubscribe using following link: <a href="{unsubscribe_link}">{unsubscribe_link}</a></p>
   </body>
 </html>
 
 """.replace("http", "https")
-    send_email(authed_email_server, email_acc, receiver_email, subject, msg_text, html_msg_text, type_="html")
+    send_email(authed_email_server, email_acc, receiver_email, subject, html_msg_text=html_msg_text, type_="html")

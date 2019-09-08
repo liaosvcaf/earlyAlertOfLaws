@@ -107,7 +107,8 @@ def subscribe():
         except Exception as e:
             flash(f'Error: ' + str(e))
         else:
-            flash(f'Subscription successsful')
+            flash('Subscription successsful')
+            flash("Check your email. If you didn't receive email, view spam folder")
     form = SubscribeEmailForm(request.form)
     return render_template('subscribe.html', form=form)
         
