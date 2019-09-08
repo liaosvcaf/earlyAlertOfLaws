@@ -111,7 +111,7 @@ def subscribe():
     form = SubscribeEmailForm(request.form)
     return render_template('subscribe.html', form=form)
         
-@app.route('/unsubscribe/<email>')
+@app.route('/unsubs/<email>')
 def unsubscribe(email):
     try:
         unsubscribe_email(email)
