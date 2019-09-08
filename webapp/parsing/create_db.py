@@ -73,7 +73,7 @@ LOGGING_LEVEL = logging.DEBUG
 LOG_FILE_NAME = "errors.log"
 BILL_CHANGES_LOG_FILE_NAME = "bills.log"
 
-logger = logging.getLogger()
+logger = logging.getLogger("errors")
 logger.setLevel(LOGGING_LEVEL)
 handler = logging.FileHandler(LOG_FILE_NAME, 'a', 'utf-8')
 formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
@@ -145,7 +145,7 @@ def log_bill_changes(action, bill_info):
         action_text = "Bill updated: "
     elif action == BILL_ADDED:
         action_text = "Bill added: "
-    logger.info(action_text + bill_info["leginfo_id"])
+    bills_changes_logger.info(action_text + bill_info["leginfo_id"])
 
 def update_bills_in_elasticsearch(leginfo_ids):
     with app.app_context():
