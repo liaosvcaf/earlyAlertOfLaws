@@ -1,8 +1,12 @@
 from forms import AddKeywordForm, SubscribeEmailForm, TimeWindowForm
 from flask import flash, render_template, request, escape, redirect, url_for, session
+from flask_paginate import Pagination, get_page_parameter
+
+from parsing.notifications import send_email_subs_start_notification
+from parsing.parsing_options import (email_server, email_acc, email_port, 
+                                     email_pass)
 from init_app import app
 from models import Bill
-from flask_paginate import Pagination, get_page_parameter
 
 
 def get_all_keywords():
@@ -94,17 +98,21 @@ def subscribe():
     if request.method == 'POST':
         email = request.form.get('email')
         kws = request.form.get('kws')
+        kws = [kw.strip() for kw in kws.split(",")]
         time_limit = request.form.get('time_limit')
         try:
-            subscribe_email(email, kws, time_limit)
+            subscribe_email(email, ",".join(kws), time_limit)
+            send_email_subs_start_notification(email, kws, email_server, 
+                                               email_acc, email_port, email_pass)
         except Exception as e:
             flash(f'Error: ' + str(e))
         else:
-            flash(f'Subscription successsful')
+            flash('Subscription successsful')
+            flash("Check your email. If you didn't receive email, view spam folder")
     form = SubscribeEmailForm(request.form)
     return render_template('subscribe.html', form=form)
         
-@app.route('/unsubscribe/<email>')
+@app.route('/unsubs/<email>')
 def unsubscribe(email):
     try:
         unsubscribe_email(email)
@@ -134,4 +142,5 @@ def page_not_found(e):
     return render_template('404.html'), 404
 
 if __name__ == '__main__':
+    #app.run()
     app.run("0.0.0.0", port=80)

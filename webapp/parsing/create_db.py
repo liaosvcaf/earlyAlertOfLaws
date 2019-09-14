@@ -73,20 +73,22 @@ LOGGING_LEVEL = logging.DEBUG
 LOG_FILE_NAME = "errors.log"
 BILL_CHANGES_LOG_FILE_NAME = "bills.log"
 
-logger = logging.getLogger()
+logger = logging.getLogger("errors")
 logger.setLevel(LOGGING_LEVEL)
-handler = logging.FileHandler(LOG_FILE_NAME, 'w', 'utf-8')
+handler = logging.FileHandler(LOG_FILE_NAME, 'a', 'utf-8')
 formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 bills_changes_logger = logging.getLogger("bills_changes_logger")
 bills_changes_logger.setLevel(LOGGING_LEVEL)
-bills_changes_handler = logging.FileHandler(BILL_CHANGES_LOG_FILE_NAME, 'w', 'utf-8')
+bills_changes_handler = logging.FileHandler(BILL_CHANGES_LOG_FILE_NAME, 'a', 'utf-8')
 formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 bills_changes_handler.setFormatter(formatter)
 bills_changes_logger.addHandler(bills_changes_handler)
 
+logger.info("PARSING STARTED")
+bills_changes_logger.info("PARSING STARTED")
 
 try:
     email_server = get_auth_smtp_server(email_server, email_port, email_acc, email_pass)
@@ -143,7 +145,7 @@ def log_bill_changes(action, bill_info):
         action_text = "Bill updated: "
     elif action == BILL_ADDED:
         action_text = "Bill added: "
-    logger.info(action_text + bill_info["leginfo_id"])
+    bills_changes_logger.info(action_text + bill_info["leginfo_id"])
 
 def update_bills_in_elasticsearch(leginfo_ids):
     with app.app_context():
@@ -363,10 +365,11 @@ def save_bills_info(bill_links, r_session, check_unique):
             log_exception(traceback.format_exc(), bill_info)
             traceback.print_exc()
             continue
-        break
     update_bills_in_elasticsearch(saved_bills_leginfo_ids)
     print("Updated bills: ", updated_bills_ids)
     print("Added bills: ", added_bills_ids)
+    bills_changes_logger.info("Updated bills: " + ", ".join(updated_bills_ids))
+    bills_changes_logger.info("Added bills: " + ", ".join(added_bills_ids))
     save_ids_of_changed_bills(added_bills_ids, updated_bills_ids)
     return bills_info
 
@@ -440,9 +443,6 @@ def parse_laws_into_db(num=-1, keyword='', session='2019-2020', bill_number='', 
     s = requests.Session()
     soup = get_soup_with_params(base_url, s, params_dict=url_params)
     
-    with open("resp.html", "w", encoding="utf-8") as f:
-        f.write(soup.text)
-        
     bills_returned_pages = soup.find('div', id='text_bill_returned')
     
     if not bills_returned_pages:
@@ -457,6 +457,7 @@ def parse_laws_into_db(num=-1, keyword='', session='2019-2020', bill_number='', 
             except:
                 attempts += 1
         if not bills_on_page_links:
+            L
             return None
         save_bills_info(bills_on_page_links, s, check_unique)
     else:

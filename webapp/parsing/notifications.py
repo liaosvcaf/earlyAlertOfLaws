@@ -27,7 +27,8 @@ logger.addHandler(handler)
 
 
 def get_auth_smtp_server(server, port, login, passw):
-    smtp = smtplib.SMTP_SSL(server, port)
+    smtp = smtplib.SMTP(server, port)
+    smtp.starttls()
     smtp.login(login, passw)
     return smtp
 
@@ -78,7 +79,7 @@ def send_email_notifications(email_server, email_port, email_pass, sender_email)
                 if not bill_info:
                     continue
                 bill_info = bill_info.split(";")
-                print(bill_info)
+                #print(bill_info)
                 bill_id = bill_info[0]
                 bill_last_action_name_prev = bill_info[1]
                 bill_info_tuple = updated_bill_info(id=bill_id,
@@ -110,7 +111,7 @@ def send_email_notifications(email_server, email_port, email_pass, sender_email)
 
 def get_msg_text(changes, email):
     logger.info("Getting message text")
-    unsubscribe_link = site_addr + "unsubscribe/" + email
+    unsubscribe_link = site_addr + "unsubs/" + email
     kws_msgs = []
     with app.app_context():
         for kw, items in changes.items():
@@ -165,24 +166,53 @@ You can unsubscribe using following link: {unsubscribe_link}
         logger.info("Email text: \n" + text)
         return text
 
+def send_email(server, from_, to, subject, msg_text=None, html_msg_text=None, type_="plain"):
+    msg = MIMEMultipart()
+    msg.add_header('From', from_)
+    msg.add_header("To", to)
+    msg.add_header("Subject", subject)
+    if type_=="plain":
+        msg.attach(MIMEText(msg_text, "plain"))
+    if type_=="html" and html_msg_text:
+        msg.attach(MIMEText(html_msg_text, "html"))    
+    server.sendmail(
+      from_,
+      to,
+      msg.as_string().encode("utf-8"))
+
 def send_changes(server, from_, to, changes):
     logger.info("Sending email notifications")
+    msg_text = get_msg_text(changes, to)
+    now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    subj = f'California Bills Updates for ' + now
     try:
-        msg_text = get_msg_text(changes, to)
-        msg = MIMEMultipart()
-        msg.add_header('From', from_)
-        msg.add_header("To", to)
-        now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        msg.add_header("Subject", f'California Bills Updates for ' + now)
-        
-        msg.attach(MIMEText(msg_text, 'plain'))
-        
-        server.sendmail(
-          from_,
-          to,
-          msg.as_string().encode("utf-8"))
-        return None
+        send_email(server, from_, to, subj, msg_text)
     except Exception:
         logger.error(traceback.format_exc())
+        print(traceback.format_exc())
         return traceback.format_exc()
     
+def send_email_subs_start_notification(receiver_email, kws, email_server, 
+                                       email_acc, email_port, email_pass):
+    authed_email_server = get_auth_smtp_server(email_server, email_port, email_acc, email_pass)
+    subject = "You have subscribed to email alerts on California Bills Monitoring App"
+    kws = "Saved keywords: " + ", ".join(kws)
+    unsubscribe_link = site_addr + "unsubs/" + receiver_email
+    
+    msg_text = "Subscription to email alerts on California Bills Monitoring App successful\n"
+    msg_text += kws + '\n'
+    msg_text += f'You can unsubscribe using following link: {unsubscribe_link}'
+    
+
+    html_msg_text = f"""
+<html>
+  <head></head>
+  <body>
+    <h2>Subscription to email alerts on California Bills Monitoring App successful</h2>
+    <p>{kws}</p>
+    <p>You can unsubscribe using following link: <a href="{unsubscribe_link}">{unsubscribe_link}</a></p>
+  </body>
+</html>
+
+""".replace("http", "https")
+    send_email(authed_email_server, email_acc, receiver_email, subject, html_msg_text=html_msg_text, type_="html")
