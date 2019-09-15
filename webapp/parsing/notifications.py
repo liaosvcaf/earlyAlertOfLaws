@@ -95,7 +95,7 @@ def send_email_notifications(email_server, email_port, email_pass, sender_email)
             changes = dict()
             for kw in kws:
                 kw_result_ids, total = make_query("bill", [kw], page=1, 
-                                                  per_page=3000, time_limit=time_limit+"y",
+                                                  per_page=3000, time_limit=time_limit,
                                                   returned_val="leginfo_id")
                 #print(kw_result_ids[:100])
                 #kw_result_ids, total = make_query("bill", [kw], page=1, 

@@ -17,8 +17,7 @@ from .parsing_options import (db_file_name, table_name, elasticsearch_server_add
                              email_acc, email_pass, email_server, email_port)
 from init_app import app
 from models import Bill
-from .notifications import (get_auth_smtp_server, send_email_notifications,
-                           clear_bills_changes, save_ids_of_changed_bills)
+from .notifications import get_auth_smtp_server, save_ids_of_changed_bills
 
 
 

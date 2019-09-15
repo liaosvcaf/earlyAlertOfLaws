@@ -13,6 +13,22 @@
 			{% endif %}
 		{% endwith %}
 	</div>
+
+	<div class="row  align-items-center justify-content-center">
+		<div class="col-md-6">
+			<p class="subs-info">
+				Subscribe to receive email alerts (info about new and updated bills that contain any of keywords you specified) every Sunday
+			</p>
+			<p class="subs-info">
+				Time limit is max publishing date for bill. If bill's publishing date is longer ago from now than specified in Time limit field, then you won't receive updates on that bill (if you prefer to not to get updates about too old bills)
+			</p>
+			<p class="subs-info">
+				If you didn't receive alerts, then there are no updates for bills with keywords you specified
+			</p>
+		</div>
+	</div>
+
+	</p>
 	<div class="row form-group align-items-center justify-content-center">
 		<form method="post" action="{{ url_for('subscribe') }}">
 			<label for="email">Email</label>

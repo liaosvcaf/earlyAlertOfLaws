@@ -60,7 +60,7 @@ def make_query(index, query_params, page, per_page, time_limit="1y", returned_va
                     "minimum_should_match": "1",
                     'should': [search_conditions],
                     "filter" : [
-                      { "range" : { "last_action_date" : { "gte" : time_lim_q}}}
+                      { "range" : { "date_published" : { "gte" : time_lim_q}}}
                     ]
                 },
               },

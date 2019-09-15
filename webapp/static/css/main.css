@@ -4,7 +4,7 @@
 
 .content-wrapper {
 	margin-bottom:50px;
-	padding: 20px;
+	padding: 40px;
 }
 
 .page-footer {
@@ -16,19 +16,19 @@
 }
 
 .time-window-btn {
-	padding-right: 1.1rem;
+	margin-bottom: 30px;
 }
 
 .results-nav-top {
 	margin-bottom: 16px;
 }
 
-.nav-item {
-	margin: 0 20px;
-}
-
 .footer-copyright {
 	padding-bottom: 10px;
+}
+
+.nav-top-links {
+	margin-left: 10px;
 }
 
 /* 320-576px */
@@ -42,9 +42,6 @@
 
 /* ------- KEYWORDS PAGE  ------- */
 
-.kws-info {
-	margin-bottom: 20px;
-}
 
 .email-subscription {
 	margin-bottom: 20px;
@@ -62,7 +59,7 @@
 /* ------- RESULTS PAGE  ------- */
 
 .results-table {
-	margin-bottom: 50px;
+	margin-bottom: 30px;
 	padding:7px;
 }
 
@@ -72,6 +69,10 @@
 
 .tw-submit {
 	margin-top: 15px;
+}
+
+.pagination-bottom {
+	margin-bottom: 40px;
 }
 
 
