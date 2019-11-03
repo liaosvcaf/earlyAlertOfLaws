@@ -50,7 +50,7 @@ def make_query(index, query_params, page, per_page, time_limit="1y", returned_va
     
     search_field = ['title', 'subject', 'text']
     
-    search_conditions = [{'fuzzy': {field: {"value": query_param, "fuzziness": "auto"}}} for field in search_field 
+    search_conditions = [{'fuzzy': {field: {"value": query_param, "fuzziness": "0"}}} for field in search_field 
                          for query_param in query_params]
     time_lim_q = "now-" + str(time_limit)
     search = current_app.elasticsearch.search(

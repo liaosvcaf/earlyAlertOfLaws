@@ -80,7 +80,7 @@ def configure():
             except Exception as e:
                 flash("Error deletuing keyword: " + str(e))
                 kws = []
-        elif request.form.get("action_type") == "change_kw":
+        elif request.form.get("action_type") == "change_tw":
             time_window = request.form.get("window")
             session["time_window"] = time_window
     #add_new_kw_form = AddKeywordForm(request.form)
@@ -136,9 +136,9 @@ def links():
     
     return render_template('links.html', links=links)
 
-@app.route('/bills/<bill_id>')
-def bill_info(bill_id):
-    bill = Bill.query.filter(Bill.id==bill_id).first()
+@app.route('/bills/<bill_leginfo_id>')
+def bill_info(bill_leginfo_id):
+    bill = Bill.query.filter(Bill.leginfo_id==bill_leginfo_id).first()
     return render_template('bill_page.html', bill=bill)
 
 @app.errorhandler(404)

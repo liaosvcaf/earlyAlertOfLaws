@@ -31,7 +31,7 @@
 		            <td>{{ bill.last_action_name }}</td>
 		            <td><a href="{{ 'http://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=' + bill.leginfo_id }}">{{ bill.title }}</a></td>
 		            <td>{{ bill.subject }}</td>
-		            <td><button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myOutput{{ bill.id }}">Open</button></td>
+		            <td><button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myOutput{{ bill.leginfo_id }}">Open</button></td>
 		        </tr>
 		        {% endfor %}
 		    </tbody>
@@ -45,7 +45,7 @@
 
 {% for bill in results %}
  <!-- Modal -->
-<div class="modal fade" id="myOutput{{ bill.id }}" role="dialog">
+<div class="modal fade" id="myOutput{{ bill.leginfo_id }}" role="dialog">
 	<div class="modal-dialog modal-lg">
 	    <!-- Modal content-->
 	    <div class="modal-content">
@@ -53,7 +53,7 @@
 	            <button type="button" class="close" data-dismiss="modal">&times;</button>
 	        </div>
 	        <div class="new-tab-btn col-3 button-wrapper">
-	                <a href="/bills/{{ bill.id }}" class="btn btn-primary" target="_blank" role="button">Open in new tab</a>
+	                <a href="/bills/{{ bill.leginfo_id }}" class="btn btn-primary" target="_blank" role="button">Open in new tab</a>
 	        </div>
 	        {% include 'bill.html' %}
 	        <div class="modal-footer">
