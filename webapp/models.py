@@ -50,7 +50,8 @@ class SearchableMixin(object):
 
 class Bill(SearchableMixin, db.Model):
     __searchable__ = ['title', 'subject', 'session', 'text', 'code', 
-                      'authors', 'leginfo_id', 'last_action_date']
+                      'authors', 'leginfo_id', 'last_action_date',
+                      'date_published']
     __table__ = db.Model.metadata.tables['bills']
     
 @classmethod

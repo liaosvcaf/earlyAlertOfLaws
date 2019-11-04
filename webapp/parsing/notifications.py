@@ -24,6 +24,8 @@ handler = logging.FileHandler(LOG_FILE_NAME, 'a', 'utf-8')
 formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
+logger.info("Logger inited")
+print("Logger inited")
 
 
 def get_auth_smtp_server(server, port, login, passw):
@@ -64,6 +66,7 @@ def clear_bills_changes():
 
 def send_email_notifications(email_server, email_port, email_pass, sender_email):
     logger.info("Entering function send_email_notifications")
+    print("!!!!!!!!!!!!Entering function send_email_notifications")
     from search import make_query
     authed_email_server = get_auth_smtp_server(email_server, email_port, sender_email, email_pass)
     with open("subscribed_emails.txt", "r") as f:
@@ -95,7 +98,7 @@ def send_email_notifications(email_server, email_port, email_pass, sender_email)
             changes = dict()
             for kw in kws:
                 kw_result_ids, total = make_query("bill", [kw], page=1, 
-                                                  per_page=3000, time_limit=time_limit+"y",
+                                                  per_page=3000, time_limit=time_limit,
                                                   returned_val="leginfo_id")
                 #print(kw_result_ids[:100])
                 #kw_result_ids, total = make_query("bill", [kw], page=1, 
@@ -133,7 +136,10 @@ def get_msg_text(changes, email):
                 last_action_name = bill.last_action_name
                 bill_code = bill.code
                 bill_link = status_client_url + '?' + bill_id
-                la_change = prev_last_action_name + " - " + last_action_name
+                if last_action_name:
+                    la_change = prev_last_action_name + " - " + last_action_name
+                else:
+                    la_change = prev_last_action_name
                 updated_msgs.append(bill_code + " (" + bill_subject + "). Last action change: " + la_change
                                    + ". Link: " + bill_link)
             if len(added_msgs) > 1:
@@ -154,7 +160,8 @@ def get_msg_text(changes, email):
                 kw_msg += added_msg + "\n"
             if updated_msg:
                 kw_msg += updated_msg + "\n"
-            kws_msgs.append(kw_msg)
+            if added_msg or updated_msg:
+                kws_msgs.append(kw_msg)
         kws_msgs = "\n".join(kws_msgs)
         text = \
         f"""

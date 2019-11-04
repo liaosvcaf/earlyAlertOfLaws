@@ -8,7 +8,7 @@ from parsing.parsing_options import (email_server, email_acc, email_port,
 from init_app import app
 from models import Bill
 
-
+    
 def get_all_keywords():
     with open('keywords.txt', 'r') as f:
         return [kw.strip() for kw in f.read().splitlines() if kw.strip()]
@@ -36,9 +36,7 @@ def search(search):
     session_tw = session.get("time_window", None)
     if session_tw:
         time_window = session_tw
-    if request.method == 'POST':
-        time_window = request.form.get("window") + "y"
-        session["time_window"] = time_window
+
     per_page = 10
     page = request.args.get(get_page_parameter(), type=int, default=1)
     offset = (page - 1) * per_page
@@ -50,21 +48,19 @@ def search(search):
             
     bills, total = Bill.get_monitoring_results(query, page=page, 
                                                per_page=per_page,
-                                               time_limit = time_window)
+                                               time_limit=time_window)
     pagination = Pagination(page=page, total=total, per_page=per_page,
                             offset=offset,
                             css_framework='bootstrap4')
-    form_tw = TimeWindowForm()
     return render_template('results.html', 
                            results=bills,
                            per_page=per_page,
                            page=page,
                            pagination=pagination,
-                           escape=escape,
-                           form_tw=form_tw)
+                           escape=escape)
 
-@app.route('/keywords', methods=['GET', 'POST'])
-def keywords():
+@app.route('/configure', methods=['GET', 'POST'])
+def configure():
     if request.method == 'POST':
         if request.form.get("action_type") == "add":
             new_keyword = request.form.get('new_kw')
@@ -84,6 +80,9 @@ def keywords():
             except Exception as e:
                 flash("Error deletuing keyword: " + str(e))
                 kws = []
+        elif request.form.get("action_type") == "change_tw":
+            time_window = request.form.get("window")
+            session["time_window"] = time_window
     #add_new_kw_form = AddKeywordForm(request.form)
     add_new_kw_form = AddKeywordForm()
     try:
@@ -91,7 +90,11 @@ def keywords():
     except Exception as e:
         flash("Error getting keywords: " + str(e))
         kws = []
-    return render_template('keywords.html', keywords=kws, form_add=add_new_kw_form)
+    form_tw = TimeWindowForm()
+    return render_template('configure.html', 
+                           keywords=kws, 
+                           form_add=add_new_kw_form,
+                           form_tw=form_tw)
 
 @app.route('/subscribe', methods=['GET', 'POST'])
 def subscribe():
@@ -110,6 +113,7 @@ def subscribe():
             flash('Subscription successsful')
             flash("Check your email. If you didn't receive email, view spam folder")
     form = SubscribeEmailForm(request.form)
+    #form.time_limit.choices = get_time_windows()
     return render_template('subscribe.html', form=form)
         
 @app.route('/unsubs/<email>')
@@ -132,9 +136,9 @@ def links():
     
     return render_template('links.html', links=links)
 
-@app.route('/bills/<bill_id>')
-def bill_info(bill_id):
-    bill = Bill.query.filter(Bill.id==bill_id).first()
+@app.route('/bills/<bill_leginfo_id>')
+def bill_info(bill_leginfo_id):
+    bill = Bill.query.filter(Bill.leginfo_id==bill_leginfo_id).first()
     return render_template('bill_page.html', bill=bill)
 
 @app.errorhandler(404)

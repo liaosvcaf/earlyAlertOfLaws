@@ -4,7 +4,7 @@
 
 .content-wrapper {
 	margin-bottom:50px;
-	padding: 20px;
+	padding: 40px;
 }
 
 .page-footer {
@@ -16,19 +16,23 @@
 }
 
 .time-window-btn {
-	padding-right: 1.1rem;
+	margin-bottom: 30px;
 }
 
 .results-nav-top {
 	margin-bottom: 16px;
 }
 
-.nav-item {
-	margin: 0 20px;
-}
-
 .footer-copyright {
 	padding-bottom: 10px;
+}
+
+.nav-top-links {
+	margin-left: 10px;
+}
+
+.nav-item {
+	margin: 0;
 }
 
 /* 320-576px */
@@ -40,11 +44,8 @@
 }
 
 
-/* ------- KEYWORDS PAGE  ------- */
+/* ------- CONFIGURE PAGE  ------- */
 
-.kws-info {
-	margin-bottom: 20px;
-}
 
 .email-subscription {
 	margin-bottom: 20px;
@@ -58,11 +59,21 @@
 	margin-top: 40px;
 }
 
+.tw-info p {
+    text-align: center;
+    font-size: 14px;
+    margin-bottom: 0;
+}
+
+.tw-info {
+    margin-bottom: 10px;
+}
+
 
 /* ------- RESULTS PAGE  ------- */
 
 .results-table {
-	margin-bottom: 50px;
+	margin-bottom: 30px;
 	padding:7px;
 }
 
@@ -74,8 +85,9 @@
 	margin-top: 15px;
 }
 
-
-/* ------- PAGINATION  ------- */
+.pagination-bottom {
+	margin-bottom: 40px;
+}
 
 .pagination-page-info {
     padding: .6em;
@@ -83,4 +95,11 @@
     width: 40em;
     margin: .5em;
     margin-left: 0;
+}
+
+
+/* ------- EMAIL SUBSCRIPTION PAGE  ------- */
+
+.email-subs-messages {
+	margin-bottom: 30px;
 }

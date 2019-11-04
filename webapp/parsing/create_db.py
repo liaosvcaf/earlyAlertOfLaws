@@ -17,8 +17,7 @@ from .parsing_options import (db_file_name, table_name, elasticsearch_server_add
                              email_acc, email_pass, email_server, email_port)
 from init_app import app
 from models import Bill
-from .notifications import (get_auth_smtp_server, send_email_notifications,
-                           clear_bills_changes, save_ids_of_changed_bills)
+from .notifications import get_auth_smtp_server, save_ids_of_changed_bills
 
 
 
@@ -309,8 +308,12 @@ def save_bills_info(bill_links, r_session, check_unique):
         # get leginfo site bill id
         bill_info = dict()
         bill_id_parsed = bill_id_regex.search(bill_link)
-        bill_id_param = bill_id_parsed.group(0)
-        bill_info['leginfo_id'] = bill_id_parsed.group(1)
+        try:
+            bill_id_param = bill_id_parsed.group(0)
+            bill_info['leginfo_id'] = bill_id_parsed.group(1)
+        except:
+            print("Failed to parse bill id from URL: ", bill_link)
+            continue
         
         # get bill attributes
         bill_status_url = status_client_url + '?' + bill_id_param
@@ -368,7 +371,7 @@ def save_bills_info(bill_links, r_session, check_unique):
     update_bills_in_elasticsearch(saved_bills_leginfo_ids)
     print("Updated bills: ", updated_bills_ids)
     print("Added bills: ", added_bills_ids)
-    bills_changes_logger.info("Updated bills: " + ", ".join(updated_bills_ids))
+    bills_changes_logger.info("Updated bills: " + ", ".join([bill.id for bill in updated_bills_ids]))
     bills_changes_logger.info("Added bills: " + ", ".join(added_bills_ids))
     save_ids_of_changed_bills(added_bills_ids, updated_bills_ids)
     return bills_info
@@ -457,7 +460,6 @@ def parse_laws_into_db(num=-1, keyword='', session='2019-2020', bill_number='', 
             except:
                 attempts += 1
         if not bills_on_page_links:
-            L
             return None
         save_bills_info(bills_on_page_links, s, check_unique)
     else:
