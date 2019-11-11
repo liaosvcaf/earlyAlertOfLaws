@@ -15,6 +15,8 @@ As a result, we are developing a web-based service to automatically monitor the 
 
 # Deployment
 
+Current live website: http://54.180.108.54/search/all
+
 ## General requirements
 
 At least 2 GB of RAM is required to run ElasticSearch.
