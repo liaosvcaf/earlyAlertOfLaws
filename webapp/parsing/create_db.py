@@ -385,6 +385,8 @@ def get_soup_with_params(base_url, session, params_dict=None, form=None):
         r = session.post(url, headers=headers, data=form)
     else:
         r = session.get(url, headers=headers)
+    with open("resp.html", "w") as f:
+        f.write(r.text)
     soup = bs4.BeautifulSoup(r.text, 'html.parser')
     return soup
     
@@ -445,6 +447,8 @@ def parse_laws_into_db(num=-1, keyword='', session='2019-2020', bill_number='', 
     
     s = requests.Session()
     soup = get_soup_with_params(base_url, s, params_dict=url_params)
+
+        
     
     bills_returned_pages = soup.find('div', id='text_bill_returned')
     
@@ -460,6 +464,7 @@ def parse_laws_into_db(num=-1, keyword='', session='2019-2020', bill_number='', 
             except:
                 attempts += 1
         if not bills_on_page_links:
+            print("No links on page")
             return None
         save_bills_info(bills_on_page_links, s, check_unique)
     else:

@@ -47,11 +47,11 @@ def save_ids_of_changed_bills(added, updated):
             lines = [lines[0], ""]
         elif len(lines) > 2:
             return
-        line_1 = lines[0] + ";;" if lines[0] else ""
-        added_all = line_1 + ";;".join(added) + "\n"
+        line_1 = lines[0] + "|" if lines[0] else ""
+        added_all = line_1 + "|".join(added) + "\n"
         updated = [";".join([bill_info.id, bill_info.last_action_name]) for bill_info in updated]
-        line_2 = lines[1] + ";;" if lines[1] else ""
-        updated_all = line_2 + ";;".join(updated)
+        line_2 = lines[1] + "|" if lines[1] else ""
+        updated_all = line_2 + "|".join(updated)
     logger.info("Added bills ids: " + added_all)
     logger.info("Updated bills ids: " + updated_all)
     with open("changed_bills.txt", "w") as f:
@@ -66,40 +66,54 @@ def clear_bills_changes():
 
 def send_email_notifications(email_server, email_port, email_pass, sender_email):
     logger.info("Entering function send_email_notifications")
-    print("!!!!!!!!!!!!Entering function send_email_notifications")
+    print("Entering function send_email_notifications")
     from search import make_query
     authed_email_server = get_auth_smtp_server(email_server, email_port, sender_email, email_pass)
     with open("subscribed_emails.txt", "r") as f:
-        email_lines = f.read().splitlines()
+        email_lines = [line for line in f.read().splitlines() if line]
     with open("changed_bills.txt", "r") as f:
         lines = f.read().splitlines()
         if len(lines) == 0 or len(lines) > 2:
             return
-        added = [bill for bill in lines[0].split(";;") if bill]
+        added = [bill for bill in lines[0].split("|") if bill]
         updated = dict()
         if len(lines) == 2:
-            for bill_info in lines[1].split(";;"):
+            for bill_info in lines[1].split("|"):
                 if not bill_info:
                     continue
                 bill_info = bill_info.split(";")
-                #print(bill_info)
+                print(bill_info)
                 bill_id = bill_info[0]
-                bill_last_action_name_prev = bill_info[1]
+                try:
+                    bill_last_action_name_prev = bill_info[1]
+                except:
+                    print("""File "/home/ubuntu/california_bills_app/parsing/notifications.py", line 87, in send_email_notifications
+    bill_last_action_name_prev = bill_info[1]
+IndexError: list index out of range""")
                 bill_info_tuple = updated_bill_info(id=bill_id,
                                                     last_action_name=\
                                                     bill_last_action_name_prev)
                 updated[bill_id] = bill_info_tuple
     logger.info("Updated bills: " + str(updated))
     logger.info("Added bills: " + str(added))
+    
+    print("Added bills: " + str(added))
+    print("Updated bills: " + str(updated))
+    
     with app.app_context():
         for email_line in email_lines:
             receiver_email, kws, time_limit = email_line.split(":")
             kws = [kw.strip() for kw in kws.split(",")]
             changes = dict()
             for kw in kws:
-                kw_result_ids, total = make_query("bill", [kw], page=1, 
-                                                  per_page=3000, time_limit=time_limit,
-                                                  returned_val="leginfo_id")
+                try:
+                    kw_result_ids, total = make_query("bill", [kw], page=1, 
+                                                      per_page=3000, time_limit=time_limit,
+                                                      returned_val="leginfo_id")
+                except:
+                    logger.error(traceback.format_exc())
+                    continue
+                    
                 #print(kw_result_ids[:100])
                 #kw_result_ids, total = make_query("bill", [kw], page=1, 
                 #                                  per_page=70, time_limit="1M")
@@ -109,16 +123,29 @@ def send_email_notifications(email_server, email_port, email_pass, sender_email)
                 #print("kw_result_ids", kw_result_ids)
                 #print("updated_kw", updated_bills_of_kw)
             logger.info("Bills changes: " + str(changes))
+            print("Bills changes: " + str(changes))
             send_changes(authed_email_server, sender_email, receiver_email, changes)
     authed_email_server.close()
+
+def is_info_to_notify(changes):
+    # changes is dict like
+    # {'chinese': [[], []], 'education': [[], []]}
+    #
+    # check whether all values are empty (like in example above)
+    return any([bool(v) for val in list(changes.values()) for v in val])
 
 def get_msg_text(changes, email):
     logger.info("Getting message text")
     unsubscribe_link = site_addr + "unsubs/" + email
     kws_msgs = []
+    is_info = is_info_to_notify(changes)
+    if not is_info:
+        return
     with app.app_context():
         for kw, items in changes.items():
             added, updated = items
+            if not added and not updated:
+                continue
             added_msgs = ["Added bills:"]
             for id_ in added:
                 bill = Bill.find_by_leginfo_id(id_)
@@ -190,6 +217,10 @@ def send_email(server, from_, to, subject, msg_text=None, html_msg_text=None, ty
 def send_changes(server, from_, to, changes):
     logger.info("Sending email notifications")
     msg_text = get_msg_text(changes, to)
+    if not msg_text:
+        logger.info("No info to notify")
+        print("No info to notify")
+        return
     now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     subj = f'California Bills Updates for ' + now
     try:
@@ -199,11 +230,12 @@ def send_changes(server, from_, to, changes):
         print(traceback.format_exc())
         return traceback.format_exc()
     
-def send_email_subs_start_notification(receiver_email, kws, email_server, 
+def send_email_subs_start_notification(receiver_email, kws, time_limit, email_server, 
                                        email_acc, email_port, email_pass):
     authed_email_server = get_auth_smtp_server(email_server, email_port, email_acc, email_pass)
     subject = "You have subscribed to email alerts on California Bills Monitoring App"
-    kws = "Saved keywords: " + ", ".join(kws)
+    kws = "Specified keywords: " + ", ".join(kws)
+    time_limit = "Time limit: " + str(time_limit)
     unsubscribe_link = site_addr + "unsubs/" + receiver_email
     
     msg_text = "Subscription to email alerts on California Bills Monitoring App successful\n"
@@ -216,10 +248,14 @@ def send_email_subs_start_notification(receiver_email, kws, email_server,
   <head></head>
   <body>
     <h2>Subscription to email alerts on California Bills Monitoring App successful</h2>
+    <p>Every Sunday you will get info about new and updated bills that contain any of keywords you specified.<p>
     <p>{kws}</p>
+    <p> Time limit is max publishing date for bill. If bill's publishing date is longer ago from now than specified in Time limit field, then you won't receive updates on that bill (if you prefer to not to get updates about too old bills).</p>
+    <p>{time_limit}</p>
     <p>You can unsubscribe using following link: <a href="{unsubscribe_link}">{unsubscribe_link}</a></p>
   </body>
 </html>
 
 """.replace("http", "https")
     send_email(authed_email_server, email_acc, receiver_email, subject, html_msg_text=html_msg_text, type_="html")
+

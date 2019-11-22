@@ -6,7 +6,7 @@ db.Model.metadata.reflect(db.engine)
 
 class SearchableMixin(object):
     @classmethod
-    def get_monitoring_results(cls, query, page, per_page, time_limit=None):
+    def get_monitoring_results(cls, query, page, per_page, time_limit="1y"):
         if not query:
             filtered = cls.query.order_by(Bill.last_action_date.desc()).all()
             filtered = filtered[(page - 1)*per_page:(page - 1)*per_page+per_page]

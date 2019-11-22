@@ -333,7 +333,8 @@ def save_bills_info(bill_links, r_session, check_unique):
             log_exception(traceback.format_exc(), bill_info)
             traceback.print_exc()
             continue
-
+    print("Updated bills: ", updated_bills_ids)
+    print("Added bills: ", added_bills_ids)
     update_bills_in_elasticsearch(saved_bills_leginfo_ids)
     return bills_info
 
