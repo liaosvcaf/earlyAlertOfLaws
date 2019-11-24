@@ -105,7 +105,7 @@ def subscribe():
         time_limit = request.form.get('time_limit')
         try:
             subscribe_email(email, ",".join(kws), time_limit)
-            send_email_subs_start_notification(email, kws, email_server, 
+            send_email_subs_start_notification(email, kws, time_limit, email_server, 
                                                email_acc, email_port, email_pass)
         except Exception as e:
             flash(f'Error: ' + str(e))

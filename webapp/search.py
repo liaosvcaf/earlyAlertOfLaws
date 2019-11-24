@@ -29,14 +29,17 @@ def create_index(index_name='bill'):
         return created
 
 def add_to_index(index, model):
-    if not current_app.elasticsearch:
-        print("not current_app.elasticsearch")
+    try:
+        if not current_app.elasticsearch:
+            print("not current_app.elasticsearch")
+            return
+        payload = {}
+        for field in model.__searchable__:
+            payload[field] = getattr(model, field)
+        current_app.elasticsearch.index(index=index, id=model.id,
+                                        body=payload)
+    except:
         return
-    payload = {}
-    for field in model.__searchable__:
-        payload[field] = getattr(model, field)
-    current_app.elasticsearch.index(index=index, id=model.id,
-                                    body=payload)
 
 def remove_from_index(index, model):
     if not current_app.elasticsearch:
