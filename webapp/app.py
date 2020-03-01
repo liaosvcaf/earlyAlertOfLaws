@@ -13,16 +13,20 @@ def get_all_keywords():
     with open('keywords.txt', 'r') as f:
         return [kw.strip() for kw in f.read().splitlines() if kw.strip()]
 
-def subscribe_email(email, kws, time_limit):
-    with open('subscribed_emails.txt', 'a') as f:
-        f.write("\n" + email + ":" + kws + ":" + time_limit + "\n")
-
-def unsubscribe_email(email):
+def delete_email_from_list(email):
     with open('subscribed_emails.txt', 'r') as f:
         lines = [line.split(":") for line in f.read().splitlines()]
         lines_updated = [":".join(line) for line in lines if line[0] != email]
     with open('subscribed_emails.txt', 'w') as f:      
         f.write("\n".join(lines_updated))
+
+def subscribe_email(email, kws, time_limit):
+    delete_email_from_list(email)
+    with open('subscribed_emails.txt', 'a') as f:
+        f.write("\n" + email + ":" + kws + ":" + time_limit + "\n")
+
+def unsubscribe_email(email):
+    delete_email_from_list(email)
         
 
 @app.route('/')
@@ -64,6 +68,7 @@ def configure():
     if request.method == 'POST':
         if request.form.get("action_type") == "add":
             new_keyword = request.form.get('new_kw')
+            new_keyword = new_keyword.lower()
             try:
                 with open('keywords.txt', 'a') as f:
                     f.write('\n' + new_keyword + '\n')
