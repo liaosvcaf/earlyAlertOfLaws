@@ -69,7 +69,9 @@ The following instruction is for Ubuntu.  However, you can deploy on another OS 
     You can check service status with
 
     `sudo service elasticsearch status -l`
-
+    
+    Press q to quite the status screen
+    
     Logs most likely are in
     /var/log/elasticsearch/
 
