@@ -40,7 +40,7 @@ The following instruction is for Ubuntu.  However, you can deploy on another OS 
 
     1. Install Java:
 
-    `apt-get install default-jdk -y`
+    `sudo apt-get install default-jdk -y`
 
     2. Import the Elasticsearch PGP Key
 
