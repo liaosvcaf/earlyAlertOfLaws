@@ -76,6 +76,9 @@ The following instruction is for Ubuntu.  However, you can deploy on another OS 
     /var/log/elasticsearch/
 
 4. Install Python requirements  
+   `git@github.com:svcaf/earlyAlertOfLaws.git`
+   
+   `cd earlyAlertOfLaws/webapp`
 
     `pip3 install -r requirements.txt`
 
