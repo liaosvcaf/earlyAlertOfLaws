@@ -23,7 +23,8 @@ else:
     year+=1
     prev_year = year-1
    
-#while year >= 2016:
+print("Parsing started: ", datetime.datetime.now())
+
 while year >= 2000:
     session = str(prev_year) + '-' + str(year)
     parse_laws_into_db(session=session, num=-1)
