@@ -112,7 +112,7 @@ If you use Ctrl-C or close terminal/ssh session, app will stop. To keep it runni
 ## DB updating
 To update the db regularly, schedule script update_db.py (use linux cron or windows scheduler). This script is also sends email notifications after updating
 
-For example, 
+For example, update the DB every Sunday 0:0
 ```
 0 0 * * 0 /usr/bin/python3 /home/ubuntu/california_bills_app/update_db.py >> ~/cron.log 2>&1
 ```
