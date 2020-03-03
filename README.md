@@ -82,13 +82,19 @@ The following instruction is for Ubuntu.  However, you can deploy on another OS 
 
     `pip3 install -r requirements.txt`
 
-5. Add bills from db to elasticsearch  
+5. Create elasticsearch index
+
+    Go to directory with scripts and run 
+    
+    `python3 recreate_index.py`
+
+6. Add bills from db to elasticsearch  
 
     Go to directory with scripts and run 
     
     `python3 reindex.py`
 
-6. Run the app  
+7. Run the app  
 
     `sudo python3 app.py`
     
