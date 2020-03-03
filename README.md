@@ -84,15 +84,18 @@ The following instruction is for Ubuntu.  However, you can deploy on another OS 
 
 4. Parse laws into DB and elasticsearch
 
-    Go to directory with scripts and run 
+    Go to directory with scripts and run the following command in a screen session (so you can ctrl-D to detach it while it is running in background)
     
-    `python3 update_db.py > my.log & `
+    `python3 update_db.py`
 
-This step may take a long time (e.g. one day). It will print out progress into the log file like:
+This step may take a long time (e.g. one day). It will print out progress like:
 ```
 Bill changed:  AB-42
 42 of 5346 bills
 ```
+
+update_db.py will also writes to a log file named bills.log .
+
 
  The resulting bills.db (SQLite format) file is big;
 ```
