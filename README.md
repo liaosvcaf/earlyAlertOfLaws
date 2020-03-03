@@ -88,17 +88,24 @@ The following instruction is for Ubuntu.  However, you can deploy on another OS 
     
     `python3 update_db.py`
 
+This step may take a long time. It will print out progress like:
+```
+Bill changed:  AB-42
+42 of 5346 bills
+```
+
+ The resulting bills.db (SQLite format) file is big;
+```
+ls -l bills.db
+-rw-rw-r-- 1 ubuntu ubuntu 197,799,936 Mar  1 01:06 bills.db
+```
+
 6. Add bills from db to elasticsearch  
 
     Go to directory with scripts and run 
     
     `python3 reindex.py`
 
-This step may take a long time. The resulting bills.db (SQLite format) file is big;
-```
-ls -l bills.db
--rw-rw-r-- 1 ubuntu ubuntu 197,799,936 Mar  1 01:06 bills.db
-```
 
 7. Run the app  
 
