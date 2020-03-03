@@ -86,9 +86,9 @@ The following instruction is for Ubuntu.  However, you can deploy on another OS 
 
     Go to directory with scripts and run 
     
-    `python3 update_db.py`
+    `python3 update_db.py > my.log & `
 
-This step may take a long time. It will print out progress like:
+This step may take a long time (e.g. one day). It will print out progress into the log file like:
 ```
 Bill changed:  AB-42
 42 of 5346 bills
