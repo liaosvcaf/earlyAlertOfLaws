@@ -75,14 +75,14 @@ The following instruction is for Ubuntu.  However, you can deploy on another OS 
     Logs most likely are in
     /var/log/elasticsearch/
 
-4. Install Python requirements  
+3. Install Python requirements  
    `git@github.com:svcaf/earlyAlertOfLaws.git`
    
    `cd earlyAlertOfLaws/webapp`
 
     `pip3 install -r requirements.txt`
 
-5. Parse laws into DB and elasticsearch
+4. Parse laws into DB and elasticsearch
 
     Go to directory with scripts and run 
     
@@ -100,21 +100,25 @@ ls -l bills.db
 -rw-rw-r-- 1 ubuntu ubuntu 197,799,936 Mar  1 01:06 bills.db
 ```
 
-6. Add bills from db to elasticsearch  
+5. Add bills from db to elasticsearch  
 
     Go to directory with scripts and run 
     
     `python3 reindex.py`
 
 
-7. Run the app  
+6. Run the app  
 
-    `sudo python3 app.py`
+    `sudo python3 app.py & `
     
     Sudo is required to to use port 80
+    
+To keep it running, you can use linux utility screen to use a dedicated screen to run app.py 
 
 ## Stopping app
-If you use Ctrl-C or close terminal/ssh session, app will stop. To keep it running, use linux utility screen. To stop the app use `sudo fuser -k 80/tcp`
+Use Ctrl-C or close terminal/ssh session, app will stop. 
+
+Or use `sudo fuser -k 80/tcp`
 
 ## DB updating
 To update the db regularly, schedule script update_db.py (use linux cron or windows scheduler). This script is also sends email notifications after updating
