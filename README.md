@@ -82,11 +82,11 @@ The following instruction is for Ubuntu.  However, you can deploy on another OS 
 
     `pip3 install -r requirements.txt`
 
-5. Create elasticsearch index
+5. Parse laws into DB and elasticsearch
 
     Go to directory with scripts and run 
     
-    `python3 recreate_index.py`
+    `python3 update_db.py`
 
 6. Add bills from db to elasticsearch  
 

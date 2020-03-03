@@ -304,7 +304,12 @@ def save_bills_info(bill_links, r_session, check_unique):
     updated_bills_ids = []
     added_bills_ids = []
     bills_info = list()
-    for bill_link in bill_links:        
+    parsed_bills_cnt = 0
+    all_bills_cnt = len(bill_links)
+    for bill_link in bill_links:
+        print(str(parsed_bills_cnt) " of " + str(all_bills_cnt) + " bills")
+        parsed_bills_cnt += 1
+
         # get leginfo site bill id
         bill_info = dict()
         bill_id_parsed = bill_id_regex.search(bill_link)
@@ -368,6 +373,7 @@ def save_bills_info(bill_links, r_session, check_unique):
             log_exception(traceback.format_exc(), bill_info)
             traceback.print_exc()
             continue
+        
     update_bills_in_elasticsearch(saved_bills_leginfo_ids)
     print("Updated bills: ", updated_bills_ids)
     print("Added bills: ", added_bills_ids)
