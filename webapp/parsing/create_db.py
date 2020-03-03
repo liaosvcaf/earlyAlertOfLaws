@@ -307,7 +307,7 @@ def save_bills_info(bill_links, r_session, check_unique):
     parsed_bills_cnt = 0
     all_bills_cnt = len(bill_links)
     for bill_link in bill_links:
-        print(str(parsed_bills_cnt) " of " + str(all_bills_cnt) + " bills")
+        print(str(parsed_bills_cnt) + " of " + str(all_bills_cnt) + " bills")
         parsed_bills_cnt += 1
 
         # get leginfo site bill id
