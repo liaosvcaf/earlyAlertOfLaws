@@ -30,6 +30,8 @@ The following instruction is for Ubuntu.  However, you can deploy on another OS 
     
     You will probably need to change variable "site_addr".  Other (including a decicated gmail account for sending email notifications) are optional and should work by default
 
+Important: enable https://www.google.com/settings/security/lesssecureapps in specifed gmail account in order to login from code and to start smtp server.
+
 1. Install Python and pip
   ```
   sudo apt-get update
