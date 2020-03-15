@@ -132,7 +132,7 @@ To update the db regularly, schedule script update_db.py (use linux cron or wind
 
 For example, update the DB every Sunday 0:0
 ```
-0 0 * * 0 /usr/bin/python3 /home/ubuntu/california_bills_app/update_db.py >> ~/cron.log 2>&1
+0 0 * * 0 /usr/bin/python3 /home/ubuntu/earlyAlertOfLaws/webapp/update_db.py >> ~/cron.log 2>&1
 ```
 
 ## Recreate elasticsearch data
