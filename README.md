@@ -26,6 +26,10 @@ Exposed 80 (HTTP) port is required to access app on other machines.
 ## Instruction
 The following instruction is for Ubuntu.  However, you can deploy on another OS (tested on Windows and CentOS). Adapt steps 1 and 2 to your OS
 
+0. Change options in file "parsing_options.py" in folder "webapp/parsing"
+    
+    You will probably need to change variable "site_addr". Other are optional and should work by default
+
 1. Install Python and pip
   ```
   sudo apt-get update

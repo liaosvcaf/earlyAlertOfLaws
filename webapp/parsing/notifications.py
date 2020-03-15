@@ -86,10 +86,9 @@ def send_email_notifications(email_server, email_port, email_pass, sender_email)
                 bill_id = bill_info[0]
                 try:
                     bill_last_action_name_prev = bill_info[1]
-                except:
-                    print("""File "/home/ubuntu/california_bills_app/parsing/notifications.py", line 87, in send_email_notifications
-    bill_last_action_name_prev = bill_info[1]
-IndexError: list index out of range""")
+                except Exception as e:
+                    print(e)
+                    
                 bill_info_tuple = updated_bill_info(id=bill_id,
                                                     last_action_name=\
                                                     bill_last_action_name_prev)
@@ -150,7 +149,7 @@ def get_msg_text(changes, email):
             for id_ in added:
                 bill = Bill.find_by_leginfo_id(id_)
                 bill_subject = bill.subject
-                bill_link = status_client_url + '?' + id_
+                bill_link = status_client_url + '?bill_id=' + id_
                 bill = Bill.find_by_leginfo_id(id_)
                 bill_code = bill.code
                 added_msgs.append(bill_code + " (" + bill_subject + "). Link: " + bill_link)
