@@ -28,7 +28,7 @@ The following instruction is for Ubuntu.  However, you can deploy on another OS 
 
 0. Change options in file "parsing_options.py" in folder "webapp/parsing"
     
-    You will probably need to change variable "site_addr". Other are optional and should work by default
+    You will probably need to change variable "site_addr".  Other (including a decicated gmail account for sending email notifications) are optional and should work by default
 
 1. Install Python and pip
   ```
