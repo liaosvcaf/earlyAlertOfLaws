@@ -116,7 +116,7 @@ ls -l bills.db
     `python3 reindex.py`
 
 
-6. Run the app  
+6. Run the app. It will provide a web service exposed to port 80.  
 
     `sudo python3 app.py & `
     
