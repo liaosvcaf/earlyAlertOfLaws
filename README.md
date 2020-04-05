@@ -5,8 +5,8 @@ There are thousands of new laws being introduced each year in California. These 
 
 As a result, we are developing a web-based service to automatically monitor the new laws of California, with the following features: 
 * A configurable web interface for users to define a few keywords, such as education, asian, chinese, etc.
-* A backend process to use the data & APIs from https://openstates.org/ to search CA laws to find the ones matching the keywords
-  * Preferred scripting language is Python
+* A backend process to use the data http://leginfo.legislature.ca.gov to search CA laws to find the ones matching the keywords
+  * Scripting language is Python
   * links to the matched laws are returned with additional info. such as abstract and full content, etc.
   * The backend process automatically refreshes daily to get latest results
 * A web page (it could be the same page accepting keywords configuration) displaces the query results with links for the laws matched.
@@ -14,6 +14,8 @@ As a result, we are developing a web-based service to automatically monitor the 
   * set up both testing and production deployment, triggered automatically.
 
 # Deployment
+
+Current live website: http://54.180.108.54/search/all
 
 ## General requirements
 
@@ -26,7 +28,9 @@ The following instruction is for Ubuntu.  However, you can deploy on another OS 
 
 0. Change options in file "parsing_options.py" in folder "webapp/parsing"
     
-    You will probably need to change variable "site_addr". Other are optional and should work by default
+    You will probably need to change variable "site_addr".  Other (including a decicated gmail account for sending email notifications) are optional and should work by default
+
+Important: enable https://www.google.com/settings/security/lesssecureapps in specifed gmail account in order to login from code and to start smtp server.
 
 1. Install Python and pip
   ```
@@ -42,7 +46,7 @@ The following instruction is for Ubuntu.  However, you can deploy on another OS 
 
     1. Install Java:
 
-    `apt-get install default-jdk -y`
+    `sudo apt-get install default-jdk -y`
 
     2. Import the Elasticsearch PGP Key
 
@@ -53,7 +57,7 @@ The following instruction is for Ubuntu.  However, you can deploy on another OS 
     ```
     sudo apt-get install apt-transport-https
     echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
-    sudo apt-get install elasticsearch -y
+    sudo apt-get update && sudo apt-get install elasticsearch -y
     ```
 
     4. Start elasticsearch service
@@ -78,41 +82,71 @@ The following instruction is for Ubuntu.  However, you can deploy on another OS 
 
     `sudo service elasticsearch status -l`
 
-    inactive (dead) most probably means that ES failed to start. Check logs.
+    Press q to quite the status screen
 
+    inactive (dead) most probably means that ES failed to start. Check logs.    
+    
     Logs most likely are in
     /var/log/elasticsearch/
 
-4. Install Python requirements  
+3. Install Python requirements  
+   `git@github.com:svcaf/earlyAlertOfLaws.git`
+   
+   `cd earlyAlertOfLaws/webapp`
 
     `pip3 install -r requirements.txt`
 
-5. Parse laws into DB and elasticsearch
+4. Parse laws into DB and elasticsearch
 
-    Go to directory with scripts and run 
+    Go to directory with scripts and run the following command in a screen session (so you can ctrl-D to detach it while it is running in background)
     
     `python3 update_db.py`
 
-6. Add bills from db to elasticsearch  
+This step may take a long time (e.g. one day). It will print out progress like:
+```
+Bill changed:  AB-42
+42 of 5346 bills
+```
+
+update_db.py will also writes to a log file named bills.log .
+
+
+ The resulting bills.db (SQLite format) file is big;
+```
+ls -l bills.db
+-rw-rw-r-- 1 ubuntu ubuntu 197,799,936 Mar  1 01:06 bills.db
+```
+
+5. Add bills from db to elasticsearch  
 
     Go to directory with scripts and run 
     
     `python3 reindex.py`
 
-7. Run the app  
 
-    `sudo python3 app.py`
+6. Run the app. It will provide a web service exposed to port 80.  
+
+    `sudo python3 app.py & `
     
     Sudo is required to to use port 80
+    
+To keep it running, you can use linux utility screen to use a dedicated screen to run app.py 
 
 ## Updating the app from repository
 `git pull origin maste`
 
 ## Stopping app
-If you use Ctrl-C or close terminal/ssh session, app will stop. To keep it running, use linux utility screen. To stop the app use `sudo fuser -k 80/tcp`
+Use Ctrl-C or close terminal/ssh session, app will stop. 
+
+Or use `sudo fuser -k 80/tcp`
 
 ## DB updating
 To update the db regularly, schedule script update_db.py (use linux cron or windows scheduler). This script is also sends email notifications after updating
+
+For example, update the DB every Sunday 0:0
+```
+0 0 * * 0 /usr/bin/python3 /home/ubuntu/earlyAlertOfLaws/webapp/update_db.py >> ~/cron.log 2>&1
+```
 
 ## Recreate elasticsearch data
 If there are problems with elasticsearch data, you can delete and create bills entries with:
