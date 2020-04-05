@@ -68,9 +68,17 @@ The following instruction is for Ubuntu.  However, you can deploy on another OS 
     sudo -i service elasticsearch stop
     ```
 
+    Or 
+    ```
+    sudo /bin/systemctl daemon-reload
+    sudo /bin/systemctl enable elasticsearch.service
+    ```
+
     You can check service status with
 
     `sudo service elasticsearch status -l`
+
+    inactive (dead) most probably means that ES failed to start. Check logs.
 
     Logs most likely are in
     /var/log/elasticsearch/
@@ -96,6 +104,9 @@ The following instruction is for Ubuntu.  However, you can deploy on another OS 
     `sudo python3 app.py`
     
     Sudo is required to to use port 80
+
+## Updating the app from repository
+`git pull origin maste`
 
 ## Stopping app
 If you use Ctrl-C or close terminal/ssh session, app will stop. To keep it running, use linux utility screen. To stop the app use `sudo fuser -k 80/tcp`
