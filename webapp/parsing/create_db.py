@@ -214,9 +214,13 @@ def get_bill_text_and_date_published(bill_info, text_client_url, bill_id_param, 
         # [2:-1] - for removing b'' after converting bytes to str
         bill_info['text'] = re.sub(r'\n\n\n|\\t|\t|\\n', '', html_to_text(str(new_tree)))[2:-1]
     
-        date_published = tree.xpath('//span[contains(text(), "Date Published")]')[0]
-        date_publiched = date_publiched_regex.search(date_published.text).group(1)
-        date_publiched = date_reformat_regex.sub(r'\3-\1-\2', date_publiched)
+        date_published = tree.xpath('//span[contains(text(), "Date Published")]')
+        if not date_published:
+            date_publiched = ''
+        else:
+            date_published = date_published[0]
+            date_publiched = date_publiched_regex.search(date_published.text).group(1)
+            date_publiched = date_reformat_regex.sub(r'\3-\1-\2', date_publiched)
         bill_info['date_published'] = date_publiched
     except:
         log_exception(traceback.format_exc(), bill_info)

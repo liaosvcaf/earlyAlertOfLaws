@@ -11,7 +11,12 @@ from models import Bill
     
 def get_all_keywords():
     with open('keywords.txt', 'r') as f:
-        return [kw.strip() for kw in f.read().splitlines() if kw.strip()]
+        res = []
+        kws = [kw.strip() for kw in f.read().splitlines() if kw.strip()]
+        for kw in kws:
+            for kw_word in kw.split():
+                res.apend(kw_word)
+        return res
 
 def delete_email_from_list(email):
     with open('subscribed_emails.txt', 'r') as f:

@@ -72,11 +72,19 @@ Important: enable https://www.google.com/settings/security/lesssecureapps in spe
     sudo -i service elasticsearch stop
     ```
 
+    Or 
+    ```
+    sudo /bin/systemctl daemon-reload
+    sudo /bin/systemctl enable elasticsearch.service
+    ```
+
     You can check service status with
 
     `sudo service elasticsearch status -l`
-    
+
     Press q to quite the status screen
+
+    inactive (dead) most probably means that ES failed to start. Check logs.    
     
     Logs most likely are in
     /var/log/elasticsearch/
@@ -123,6 +131,9 @@ ls -l bills.db
     Sudo is required to to use port 80
     
 To keep it running, you can use linux utility screen to use a dedicated screen to run app.py 
+
+## Updating the app from repository
+`git pull origin maste`
 
 ## Stopping app
 Use Ctrl-C or close terminal/ssh session, app will stop. 
