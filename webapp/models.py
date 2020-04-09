@@ -44,7 +44,6 @@ class SearchableMixin(object):
                 print(obj.id)
                 add_to_index(cls.__tablename__, obj)
             except:
-                raise
                 traceback.print_exc()
                 continue
     

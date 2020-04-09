@@ -42,8 +42,6 @@ def search(search):
     if session_tw:
         time_window = session_tw
 
-    print("!!!!!!", time_window)
-
     per_page = 10
     page = request.args.get(get_page_parameter(), type=int, default=1)
     offset = (page - 1) * per_page
@@ -95,7 +93,7 @@ def configure():
     add_new_kw_form = AddKeywordForm()
     try:
         kws = get_all_keywords()
-        print(kws)
+        print("Keywords: ", kws)
     except Exception as e:
         flash("Error getting keywords: " + str(e))
         kws = []
