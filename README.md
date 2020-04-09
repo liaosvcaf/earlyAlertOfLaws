@@ -106,7 +106,7 @@ The following instruction is for Ubuntu.  However, you can deploy on another OS 
     Sudo is required to to use port 80
 
 ## Updating the app from repository
-`git pull origin maste`
+`git pull origin master`
 
 ## Stopping app
 If you use Ctrl-C or close terminal/ssh session, app will stop. To keep it running, use linux utility screen. To stop the app use `sudo fuser -k 80/tcp`
