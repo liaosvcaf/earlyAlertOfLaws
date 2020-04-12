@@ -1,3 +1,5 @@
+import os
+import markdown2
 from forms import AddKeywordForm, SubscribeEmailForm, TimeWindowForm
 from flask import (flash, render_template, request, escape, redirect, url_for, 
                    session, abort)
