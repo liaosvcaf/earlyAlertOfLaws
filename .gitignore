@@ -1,2 +1,6 @@
 **/__pycache__
 *.pyc
+webapp/bills.db
+webapp/keywords.txt
+webapp/notifications.log
+webapp/subscribed_emails.txt
