@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 def create_app():
     app = Flask(__name__)
-    app.elasticsearch = Elasticsearch('http://localhost:9200')
+    app.elasticsearch = Elasticsearch('http://localhost:9200', http_compress=True)
     
     app.secret_key = 'super secret key'
     app.config['SESSION_TYPE'] = 'filesystem'

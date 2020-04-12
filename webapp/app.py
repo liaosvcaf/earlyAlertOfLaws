@@ -11,12 +11,8 @@ from models import Bill
     
 def get_all_keywords():
     with open('keywords.txt', 'r') as f:
-        res = []
         kws = [kw.strip() for kw in f.read().splitlines() if kw.strip()]
-        for kw in kws:
-            for kw_word in kw.split():
-                res.apend(kw_word)
-        return res
+        return kws
 
 def delete_email_from_list(email):
     with open('subscribed_emails.txt', 'r') as f:
@@ -41,7 +37,7 @@ def redirect_main_page():
 @app.route('/search/<search>', methods=['GET', 'POST'])
 def search(search):
     # time window in years
-    time_window = "1y"
+    time_window = "20y"
     session_tw = session.get("time_window", None)
     if session_tw:
         time_window = session_tw
@@ -97,6 +93,7 @@ def configure():
     add_new_kw_form = AddKeywordForm()
     try:
         kws = get_all_keywords()
+        print("Keywords: ", kws)
     except Exception as e:
         flash("Error getting keywords: " + str(e))
         kws = []

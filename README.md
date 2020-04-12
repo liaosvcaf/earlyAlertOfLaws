@@ -133,7 +133,7 @@ ls -l bills.db
 To keep it running, you can use linux utility screen to use a dedicated screen to run app.py 
 
 ## Updating the app from repository
-`git pull origin maste`
+`git pull origin master`
 
 ## Stopping app
 Use Ctrl-C or close terminal/ssh session, app will stop. 

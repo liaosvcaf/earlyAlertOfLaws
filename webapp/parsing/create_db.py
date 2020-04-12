@@ -226,7 +226,7 @@ def get_bill_text_and_date_published(bill_info, text_client_url, bill_id_param, 
         log_exception(traceback.format_exc(), bill_info)
         traceback.print_exc()
         bill_info['text'] = ''
-        bill_info['date_published'] = ''
+        bill_info['date_published'] = None
 
 def get_bill_attrs(bill_info, bill_status_soup):
     # title, house_location, authors
@@ -278,9 +278,9 @@ def get_bill_last_action(bill_info, bill_status_soup):
             last_action_date = datetime.datetime.strptime(last_action_date, "%m/%d/%y").strftime("%Y-%m-%d")
             bill_info["last_action_date"] = last_action_date
         else:
-            bill_info["last_action_date"] = ""
+            bill_info["last_action_date"] = None
     except:
-        bill_info["last_action_date"] = ""
+        bill_info["last_action_date"] = None
         log_exception(traceback.format_exc(), bill_info)
         traceback.print_exc()
         

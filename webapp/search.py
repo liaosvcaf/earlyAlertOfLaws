@@ -1,4 +1,5 @@
 from flask import current_app
+import traceback
 
 
 def remove_index(index_name='bill'):
@@ -13,9 +14,21 @@ def create_index(index_name='bill'):
           "last_action_date": {
             "type": "date",
             "ignore_malformed": True
-          }
+          },
+          "text": {
+            "type": "text",
+            "normalizer": "useLowercase",
+          },
         }
-      }
+      },
+        "analysis": {
+          "normalizer": {
+            "useLowercase": {
+              "type": "custom",
+              "filter": [ "lowercase" ]
+            }
+          }
+         }
     }
     try:
         if not current_app.elasticsearch.indices.exists(index_name):
@@ -36,10 +49,14 @@ def add_to_index(index, model):
         payload = {}
         for field in model.__searchable__:
             payload[field] = getattr(model, field)
+            if payload[field] == "" and field == "date_published":
+                payload[field] = None
+            if field == "text":
+                payload[field] = payload[field].lower()
         current_app.elasticsearch.index(index=index, id=model.id,
                                         body=payload)
     except:
-        return
+        traceback.print_exc()
 
 def remove_from_index(index, model):
     if not current_app.elasticsearch:
@@ -55,20 +72,40 @@ def make_query(index, query_params, page, per_page, time_limit="1y", returned_va
     
     search_conditions = []
     
+    '''
+    # simple (only one word)
     search_conditions = [{'fuzzy': {field: {"value": query_param, "fuzziness": "0"}}} for field in search_field 
                          for query_param in query_params]
-
-    '''
+    
+    # multi-word exact match (adjacent and order kept)
     for param in query_params:
-        for field in search_field:
-            if len(param.split(" ")) > 1:
-                must = [{'fuzzy': {field: {"value": term, "fuzziness": "0"}}} for term in param.split(" ")]
-                search_condition = {'bool': {'must': must}}
-                search_conditions.append(search_condition)
-            else:
+        if len(param.split(" ")) > 1:
+            conditions = [{'match_phrase': {field: param}} for field in search_field]
+            must = [{'bool': {"minimum_should_match": "1", 'should': conditions}}]
+            search_condition = {'bool': {'must': must}}
+            search_conditions.append(search_condition)
+        else:
+            for field in search_field:
                 search_condition = {'fuzzy': {field: {"value": param, "fuzziness": "0"}}}
                 search_conditions.append(search_condition)
     '''
+    
+    # multi-word fuzzy (words not necessary abjacent)
+    for param in query_params:
+        if len(param.split(" ")) > 1:
+            shoulds = []
+            for term in param.split(" "):
+                conditions = [{'fuzzy': {field: {"value": term, "fuzziness": "0"}}} for field in search_field]
+                shoulds.append(conditions)
+            must = [{'bool': {"minimum_should_match": "1", 'should': should}} for should in shoulds]
+            search_condition = {'bool': {'must': must}}
+            search_conditions.append(search_condition)
+        else:
+            for field in search_field:
+                search_condition = {'fuzzy': {field: {"value": param, "fuzziness": "0"}}}
+                search_conditions.append(search_condition)
+                
+    print(search_conditions)
     
     time_lim_q = "now-" + str(time_limit)
     search = current_app.elasticsearch.search(
@@ -78,7 +115,7 @@ def make_query(index, query_params, page, per_page, time_limit="1y", returned_va
                     "minimum_should_match": "1",
                     'should': [search_conditions],
                     "filter" : [
-                      { "range" : { "date_published" : { "gte" : time_lim_q}}}
+                      { "range" : { "last_action_date" : { "gte" : time_lim_q}}}
                     ]
                 },
               },
