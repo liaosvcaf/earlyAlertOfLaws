@@ -1,5 +1,8 @@
+import os
+import markdown2
 from forms import AddKeywordForm, SubscribeEmailForm, TimeWindowForm
-from flask import flash, render_template, request, escape, redirect, url_for, session
+from flask import (flash, render_template, request, escape, redirect, url_for, 
+                   session, abort)
 from flask_paginate import Pagination, get_page_parameter
 
 from parsing.notifications import send_email_subs_start_notification
@@ -142,6 +145,14 @@ def links():
         links = []
     
     return render_template('links.html', links=links)
+
+@app.route('/help', methods=['GET'])
+def help_route():
+    if not os.path.exists("help.md"):
+        abort(404)
+    with open("help.md", "r") as f:
+        page_html = markdown2.markdown(f.read())
+    return render_template('help.html', page_html=page_html)
 
 @app.route('/bills/<bill_leginfo_id>')
 def bill_info(bill_leginfo_id):

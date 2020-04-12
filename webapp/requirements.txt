@@ -6,3 +6,4 @@ flask_sqlalchemy
 requests
 BeautifulSoup4
 lxml
+markdown2
