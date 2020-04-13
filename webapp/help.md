@@ -1,3 +1,5 @@
-# This is text
+On the main page you can see California laws that contains specific keywords.
 
-## another text
+Use tab "Configure" to configure keywords.
+
+You can subscribe to weekly email alerts about new and updated laws in the tab "Subcribe".
